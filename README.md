@@ -27,4 +27,4 @@ Hệ thống được thiết kế với 4 vai trò (Actors) chính tương ứn
 
 ## 🚀 Trải nghiệm
 
-👉 **Link truy cập:** [https://link-trang-web-cua-ban.com](giaynghiphepbenhvien.infinityfreeapp.com)
+👉 **Link truy cập:** [giaynghiphepbenhvien.infinityfreeapp.com](giaynghiphepbenhvien.infinityfreeapp.com)
