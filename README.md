@@ -10,9 +10,9 @@ Hệ thống được thiết kế với 4 vai trò (Actors) chính tương ứn
     *   Xem lịch sử nghỉ phép và trạng thái đơn hiện tại.
 *   **Trưởng khoa:**
     *   Xem danh sách đơn của nhân viên thuộc khoa quản lý.
-    *   Phê duyệt hoặc Từ chối (cấp 1) kèm ý kiến.
+    *   Phê duyệt hoặc Từ chối thuộc khoa quản lý kèm ý kiến.
 *   **Lãnh đạo / Ban Giám đốc:**
-    *   Phê duyệt đơn cấp 2 (đối với các đơn đã được Trưởng khoa duyệt).
+    *   Phê duyệt đơn (đối với các đơn đã được Trưởng khoa duyệt).
 *   **Phòng Nhân sự:**
     *   Tiếp nhận các đơn đã duyệt thành công.
     *   Quản lý quỹ phép năm.
