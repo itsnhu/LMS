@@ -1,4 +1,4 @@
-# Hệ Thống Quản Lý Nghỉ Phép - Bệnh Viện Tâm Trí Đồng Tháp
+# Hệ Thống Quản Lý Đơn Nghỉ Phép 
 
 ## Chức năng chính
 
@@ -26,6 +26,4 @@ Hệ thống được thiết kế với 4 vai trò (Actors) chính tương ứn
 *   **Môi trường:** XAMPP
 
 ## 🚀 Trải nghiệm
-
-👉 **[BẤM VÀO ĐÂY ĐỂ TRẢI NGHIỆM HỆ THỐNG][https://giaynghiphepbienvien.infinityfreeapp.com](https://giaynghiphepbienvien.infinityfreeapp.com)** 
-https://giaynghiphepbenhvien.infinityfreeapp.com/frontend/dangnhap.html
+👉 **[BẤM VÀO ĐÂY ĐỂ TRẢI NGHIỆM HỆ THỐNG](https://giaynghiphepbenhvien.infinityfreeapp.com/frontend/dangnhap.html)** 
