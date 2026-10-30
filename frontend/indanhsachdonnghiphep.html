@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In Giấy Nghỉ Phép - Hệ Thống Quản Lý Giấy Nghỉ Phép</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ============================================================ GLOBAL ============================================================ */
+* { box-sizing: border-box; font-family: "Times New Roman", Times, serif; }
+body {
+    background-color: #f1f5f9;
+    margin: 0;
+    padding: 20px 0;
+    font-size: 13pt;
+    color: #000;
+}
+
+/* ============================================================ THANH CÔNG CỤ (no-print) ============================================================ */
+.no-print {
+    max-width: 210mm;
+    margin: 0 auto 15px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 0 5mm;
+}
+
+/* ============================================================ KHUNG GIẤY A4 ============================================================ */
+.print-container {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm 15mm 15mm 20mm;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================================ HEADER 2 CỘT ============================================================ */
+.header-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    table-layout: fixed;
+}
+.header-table td { vertical-align: top; padding: 0; }
+
+.hospital-name {
+    font-weight: bold;
+    font-size: 12pt;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.6;
+    padding: 0 5px;
+}
+.hospital-name .hn-main {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 1px;
+    display: inline;
+}
+
+.national-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12pt;
+    white-space: nowrap;
+    line-height: 1.35;
+    letter-spacing: 0.1px;
+}
+.motto {
+    text-align: center;
+    font-weight: bold;
+    font-size: 11pt;
+    margin-top: 2px;
+    white-space: nowrap;
+    line-height: 1.35;
+}
+.underline {
+    width: 130px;
+    height: 1px;
+    background: #000;
+    margin: 3px auto 10px auto;
+}
+
+.director-block {
+    text-align: center;
+    margin-top: 5px;
+}
+.director-title {
+    font-weight: bold;
+    font-size: 12pt;
+    text-transform: uppercase;
+}
+.director-name {
+    font-weight: bold;
+    font-size: 12pt;
+    margin-top: 3px;
+}
+
+/* ============================================================ THÔNG TIN CÁ NHÂN ============================================================ */
+.emp-info {
+    font-size: 12pt;
+    line-height: 1.5;
+}
+.emp-info .val-upper {
+    font-size: 12.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* ============================================================ TIÊU ĐỀ CHÍNH ============================================================ */
+.doc-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16pt;
+    margin: 15px 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.quota-info {
+    font-size: 12pt;
+    margin-bottom: 3px;
+    line-height: 1.4;
+}
+.notice-info {
+    font-size: 11pt;
+    font-style: italic;
+    margin-bottom: 12px;
+}
+
+/* ============================================================ BẢNG DẠNG SỔ THEO DÕI 7 CỘT ============================================================ */
+.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+    table-layout: fixed;
+}
+
+.ledger-table th,
+.ledger-table td {
+    border: 1px solid #000;
+    padding: 6px 4px;
+    font-size: 10.5pt;
+    line-height: 1.35;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.ledger-table th {
+    text-align: center;
+    font-weight: bold;
+    background-color: #f8fafc;
+    vertical-align: middle;
+    letter-spacing: 0.1px;
+    padding: 8px 4px;
+}
+.ledger-table th small {
+    font-weight: normal;
+    font-style: italic;
+    font-size: 9pt;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+.ledger-table td.cell-time {
+    vertical-align: top;
+    text-align: center;
+    padding: 6px 5px;
+}
+.ledger-table td.cell-time .row-line {
+    line-height: 1.45;
+    text-align: center;
+}
+.ledger-table td.cell-time .ca-nghi-line {
+    font-size: 9pt;
+    color: #333;
+    margin-top: 3px;
+    font-style: italic;
+    line-height: 1.3;
+    text-align: center;
+}
+.ledger-table td.cell-time .ca-nghi-line strong {
+    font-style: normal;
+    color: #0f172a;
+}
+
+/* ⭐ CELL CHỮ KÝ — nội dung căn giữa */
+.ledger-table td.cell-sign {
+    vertical-align: middle;
+    text-align: center;
+    padding: 6px 4px;
+    min-height: 120px;
+}
+
+/* Lý do nghỉ — vẫn căn trái nhưng nằm trong cell centered */
+.ledger-table td.cell-sign .ly-do-text {
+    text-align: left;
+    margin-bottom: 6px;
+    padding: 0 2px;
+    line-height: 1.35;
+    font-size: 10pt;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ⭐ WRAPPER ảnh + tên — căn giữa hoàn hảo */
+.sign-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px 0 2px;
+    width: 100%;
+}
+
+.img-signature {
+    max-width: 100%;
+    max-height: 100px;
+    min-height: 80px;
+    width: auto;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+
+    background: transparent;
+    filter: grayscale(1) contrast(1.5) brightness(1.1); 
+}
+
+/* ⭐ TÊN NGƯỜI KÝ — dưới ảnh, căn giữa, size = ca nghỉ (9pt) */
+.sign-name {
+    font-weight: 700;
+    font-size: 9pt;
+    text-align: center;
+    color: #0f172a;
+    line-height: 1.3;
+    letter-spacing: 0.2px;
+    word-break: break-word;
+    max-width: 100%;
+    padding: 2px 4px 0;
+    margin-top: 2px;
+    border-top: 1px dashed #94a3b8;
+    width: 90%;
+}
+
+/* Placeholder khi chưa có chữ ký */
+.sign-placeholder {
+    font-size: 9pt;
+    color: #94a3b8;
+    font-style: italic;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.3;
+    padding: 4px;
+}
+
+.ledger-table td.cell-num {
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+.ledger-table td.cell-date {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 10pt;
+    padding: 6px 5px;
+}
+.ledger-table td.cell-date strong {
+    font-size: 11pt;
+}
+
+/* ============================================================ LOADING / ERROR ============================================================ */
+.loading-box, .error-box {
+    max-width: 210mm;
+    margin: 40px auto;
+    padding: 40px 20px;
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+.loading-box .spinner {
+    width: 44px; height: 44px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #4A90E2;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-box .err-icon {
+    font-size: 48px;
+    color: #cbd5e1;
+    margin-bottom: 16px;
+}
+.error-box .err-msg {
+    color: #64748b;
+    font-size: 15px;
+    font-family: "Times New Roman", Times, serif;
+}
+
+/* ============================================================ CSS DÀNH RIÊNG CHO MÁY IN ============================================================ */
+@media print {
+    body { background: #fff; padding: 0; }
+    .no-print { display: none !important; }
+    #printNote { display: none !important; }
+
+    .print-container {
+        width: 100%;
+        min-height: auto;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        display: block;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 15mm 15mm 15mm 20mm;
+    }
+
+    .ledger-table th {
+        background-color: transparent !important;
+    }
+
+    .ledger-table th,
+    .ledger-table td {
+        padding: 4px 4px;
+        font-size: 10pt;
+    }
+
+    .img-signature {
+        max-height: 100px;
+        min-height: 80px;
+        filter: grayscale(1) contrast(1.5) brightness(1.1);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .sign-name {
+        font-size: 9pt;
+        border-top: 1px dashed #64748b;
+    }
+
+    .ledger-table thead {
+        display: table-header-group;
+    }
+    .ledger-table tr {
+        page-break-inside: avoid;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-box" id="loadingState">
+    <div class="spinner"></div>
+    <div style="color:#64748b; font-family:'Times New Roman', Times, serif;">Đang tải dữ liệu in...</div>
+</div>
+
+<!-- ERROR -->
+<div class="error-box d-none" id="errorState" style="display:none;">
+    <div class="err-icon"><i class="fas fa-circle-exclamation"></i></div>
+    <div class="err-msg" id="errorMsg">Không thể tải dữ liệu.</div>
+    <div style="margin-top: 16px;">
+        <a href="lichsudonnghiphep.html" style="display:inline-block; padding:8px 18px; background:#e2e8f0; color:#475569; border-radius:8px; text-decoration:none; font-weight:600; font-family:'Times New Roman', Times, serif; font-size:13px;">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<!-- NỘI DUNG IN -->
+<div id="printArea" style="display:none;">
+
+    <div class="no-print">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a id="btnBack" href="lichsudonnghiphep.html" style="text-decoration: none; color: #475569; padding: 6px 14px; background: #e2e8f0; border-radius: 6px; font-size: 13px; font-weight: 600; font-family:'Times New Roman', Times, serif;">
+                <i class="fas fa-arrow-left me-1"></i> Quay lại
+            </a>
+            <span style="font-size: 13px; color: #64748b; font-family:'Times New Roman', Times, serif;">
+                Khổ in chuẩn: <strong>A4 Portrait (Dọc)</strong> &bull; Sổ theo dõi phép năm
+            </span>
+        </div>
+        <div>
+            <button onclick="window.print()" style="background-color: #0284c7; color: #ffffff; border: none; padding: 8px 20px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family:'Times New Roman', Times, serif;">
+                <i class="fas fa-print"></i> IN GIẤY NGHỈ PHÉP
+            </button>
+        </div>
+    </div>
+
+    <div class="print-container">
+
+        <!-- 1. HEADER -->
+        <table class="header-table">
+            <tr>
+                <td style="width: 45%;">
+                    <div class="hospital-name">
+                        <span class="hn-prefix" id="hospitalPrefix">BỆNH</span> <span class="hn-main" id="hospitalMain">VIỆN TÂM TRÍ ĐỒNG</span> <span class="hn-suffix" id="hospitalSuffix">THÁP</span>
+                    </div>
+                </td>
+                <td style="width: 55%;">
+                    <div class="national-title">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+                    <div class="motto">Độc lập - Tự do - Hạnh phúc</div>
+                    <div class="underline"></div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 2. TIÊU ĐỀ -->
+        <div class="doc-title">
+            GIẤY NGHỈ PHÉP NĂM <span id="year">----</span>
+        </div>
+
+        <!-- 2b. CẤP CHO / CHỨC VỤ / NGƯỜI DUYỆT -->
+        <table class="header-table" style="margin-bottom: 10px;">
+            <tr>
+                <td style="width: 55%;">
+                    <div class="emp-info">
+                        Cấp cho: <span class="val-upper" id="capChoHoTen">—</span><br>
+                        Chức vụ: <span class="val-upper" id="capChoChucVu">—</span>
+                    </div>
+                </td>
+                <td style="width: 45%; text-align: center;">
+                    <div class="director-block">
+                        <!-- ⭐ Đã thêm ID để JS nhận diện -->
+                        <div class="director-title" id="approverTitle">GIÁM ĐỐC</div>
+                        <div class="director-name" id="hospitalDirector">—</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 3. QUOTA -->
+        <div class="quota-info">
+            <strong>Tổng số ngày phép năm <span id="quotaYear">----</span>:</strong>
+            <span id="quotaPhepNam">0</span> ngày +
+            <span id="quotaThamNien">0</span> thâm niên +
+            <span id="quotaChuyenSang">0</span> ngày phép cũ năm <span id="prevYear">----</span>
+            (nghỉ đến hết quý I/<span id="quotaYear2">----</span>)
+        </div>
+        <div class="notice-info">
+            (Chú ý: Nghỉ phép phải xin trước ít nhất 01 ngày)
+        </div>
+
+        <!-- 4. BẢNG 7 CỘT -->
+        <table class="ledger-table">
+            <colgroup>
+                <col style="width: 20%;">
+                <col style="width: 19%;">
+                <col style="width: 17%;">
+                <col style="width: 17%;">
+                <col style="width: 8%;">
+                <col style="width: 8%;">
+                <col style="width: 11%;">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Thời gian nghỉ phép</th>
+                    <th>Lý do nghỉ, chữ<br>ký người nghỉ</th>
+                    <th>Ý kiến của<br>trưởng<br>khoa/phòng</th>
+                    <th>Phê duyệt của<br>TP.ĐD / PGĐ / GĐ</th>
+                    <th>Số ngày<br>nghỉ</th>
+                    <th>Số ngày<br>phép<br>còn lại</th>
+                    <th>Ngày nộp<br>giấy nghỉ<br>phép<br>
+                        <small>(P.NS ghi)</small>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="ledgerBody"></tbody>
+        </table>
+
+        <div id="printNote" style="display:none;">
+            <span id="printNoteText"></span>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/* ============================================================ CONFIG ============================================================ */
+const API = {
+    inData:    '../backend/api/indanhsachdonnghiphep.php',
+    loginPage: 'dangnhap.html'
+};
+
+const CA_LABEL = {
+    'ca_ngay': 'Cả ngày',
+    'sang':    'Buổi sáng',
+    'chieu':   'Buổi chiều'
+};
+
+const CHUC_VU_MAP = {
+    'CEO': 'Giám đốc Điều hành',
+    'CMO': 'Giám đốc Chuyên môn',
+    'PGD': 'Phó Giám đốc',
+    'TRUONG_KHOA': 'Trưởng Khoa',
+    'PHO_KHOA': 'Phó Khoa',
+    'TRUONG_PHONG': 'Trưởng Phòng',
+    'PHO_PHONG': 'Phó Phòng',
+    'DIEU_DUONG_TRUONG_KHOA': 'Điều dưỡng trưởng Khoa',
+    'DIEU_DUONG_TRUONG_BV': 'Điều dưỡng trưởng Bệnh viện',
+    'BAC_SI_CHUYEN_KHOA': 'Bác sĩ Chuyên khoa',
+    'BAC_SI_DA_KHOA': 'Bác sĩ Đa khoa',
+    'BAC_SI_DIEU_TRI': 'Bác sĩ Điều trị',
+    'DIEU_DUONG': 'Điều dưỡng',
+    'NU_HO_SINH': 'Nữ hộ sinh',
+    'HO_LY': 'Hộ lý',
+    'KY_THUAT_VIEN': 'Kỹ thuật viên',
+    'DUOC_SI': 'Dược sĩ',
+    'DUOC_SI_LAM_SANG': 'Dược sĩ Lâm sàng',
+    'NHAN_VIEN_KE_TOAN': 'Nhân viên Kế toán',
+    'NHAN_VIEN_HANH_CHINH': 'Nhân viên Hành chính - Nhân sự',
+    'NHAN_VIEN_IT': 'Nhân viên Công nghệ thông tin',
+    'NHAN_VIEN_CSKH': 'Nhân viên Chăm sóc khách hàng',
+    'NHAN_VIEN_THU_NGAN': 'Nhân viên Thu ngân / Viện phí',
+    'Khác': 'Khác'
+};
+function getChucVuLabel(code) {
+    if (!code) return '';
+    return CHUC_VU_MAP[code] || code;
+}
+
+/* ============================================================ HELPERS ============================================================ */
+function e(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function formatDate(s) {
+    if (!s || s === '0000-00-00') return '-';
+    const d = new Date(s.replace(' ', 'T'));
+    if (isNaN(d)) return '-';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
+function normalizeCaNghi(ca) {
+    const valid = ['ca_ngay', 'sang', 'chieu'];
+    return (ca && valid.includes(ca)) ? ca : 'ca_ngay';
+}
+
+function caNghiLabel(ca) {
+    return CA_LABEL[normalizeCaNghi(ca)] || 'Cả ngày';
+}
+
+function getCaNghiText(buoiStart, buoiEnd) {
+    const s  = normalizeCaNghi(buoiStart);
+    const e_ = normalizeCaNghi(buoiEnd !== undefined && buoiEnd !== null ? buoiEnd : s);
+    if (s === e_) {
+        if (s === 'ca_ngay') return '';
+        return caNghiLabel(s) + ' (0.5 ngày)';
+    }
+    return caNghiLabel(s) + ' ngày đầu → ' + caNghiLabel(e_) + ' ngày cuối';
+}
+
+function buildSignSrc(path) {
+    if (!path) return '';
+    const p = String(path).trim();
+    if (!p) return '';
+    if (p.startsWith('data:image')) return p;
+    if (/^https?:\/\//i.test(p)) return p;
+    let clean = p.replace(/^\/+/, '');
+    clean = clean.replace(/^frontend\//, '');
+    return clean;
+}
+
+function unwrapPayload(json) {
+    if (!json || typeof json !== 'object') return {};
+    if (json.data && typeof json.data === 'object' && !Array.isArray(json.data)) {
+        return json.data;
+    }
+    return json;
+}
+
+function showError(msg) {
+    const loading = document.getElementById('loadingState');
+    const err = document.getElementById('errorState');
+    loading.style.display = 'none';
+    err.style.display = 'block';
+    err.classList.remove('d-none');
+    document.getElementById('errorMsg').textContent = msg;
+}
+
+function setHospitalName(fullName) {
+    const name = (fullName || '').trim().toUpperCase();
+    const words = name.split(/\s+/).filter(Boolean);
+
+    const elPrefix = document.getElementById('hospitalPrefix');
+    const elMain   = document.getElementById('hospitalMain');
+    const elSuffix = document.getElementById('hospitalSuffix');
+
+    if (!elPrefix || !elMain || !elSuffix) return;
+
+    if (words.length >= 3) {
+        elPrefix.textContent = words[0];
+        elMain.textContent   = words.slice(1, -1).join(' ');
+        elSuffix.textContent = words[words.length - 1];
+    } else {
+        elPrefix.textContent = '';
+        elMain.textContent   = name;
+        elSuffix.textContent = '';
+    }
+}
+
+/* ============================================================ BUILD LEDGER ROWS ============================================================ */
+/* ⭐ Truyền thêm defaultTruongKhoa và defaultLanhDao */
+function buildLedgerRows(allLeaves, totalSlots, employeeName, defaultTruongKhoa, defaultLanhDao) {
+    let html = '';
+
+    function buildSignBlock(imgSrc, name, altText, placeholderText) {
+        const displayName = name || altText || 'Chưa cập nhật';
+        const safeName = e(displayName);
+
+        let contentHtml = '';
+        if (imgSrc) {
+            contentHtml = `
+                <img src="${e(imgSrc)}" class="img-signature" alt="${e(altText)}"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="sign-placeholder" style="display:none; color: #cbd5e1;">${e(placeholderText || 'Lỗi ảnh')}</div>
+            `;
+        } else {
+            contentHtml = `
+                <div class="sign-placeholder">${e(placeholderText || '')}</div>
+            `;
+        }
+
+        return `
+            <div class="sign-block">
+                ${contentHtml}
+                <div class="sign-name">${safeName}</div>
+            </div>`;
+    }
+
+    for (let i = 0; i < totalSlots; i++) {
+        const item = allLeaves[i] || null;
+
+        if (item) {
+            const signNguoiNghi  = buildSignSrc(item.chu_ky_nguoi_nghi);
+            const signTruongKhoa = buildSignSrc(item.chu_ky_truong_khoa);
+            const signLanhDao    = buildSignSrc(item.chu_ky_lanh_dao);
+
+            // ⭐ Fallback ưu tiên: item -> default -> cứng
+            const tenNguoiNghi  = item.ho_ten || employeeName || 'Nhân viên';
+            const tenTruongKhoa = item.ten_truong_khoa || defaultTruongKhoa || 'Trưởng khoa/phòng';
+            const tenLanhDao    = item.ten_lanh_dao    || defaultLanhDao || 'Lãnh đạo';
+
+            const ngayNop = item.ngay_nop_nhan_su
+                ? formatDate(item.ngay_nop_nhan_su)
+                : (item.ngay_nop ? formatDate(item.ngay_nop) : '');
+
+            const soPhepConLai = (item.so_phep_con_lai_luc_nghi !== null
+                                  && item.so_phep_con_lai_luc_nghi !== undefined)
+                ? item.so_phep_con_lai_luc_nghi
+                : '-';
+
+            let caNghiText = '';
+            if (item.ca_nghi_label) {
+                caNghiText = item.ca_nghi_label;
+            } else if (item.buoi_nghi_text) {
+                caNghiText = item.buoi_nghi_text;
+            } else {
+                caNghiText = getCaNghiText(item.buoi_nghi, item.buoi_nghi_ket_thuc);
+            }
+
+            html += `
+                <tr>
+                    <td class="cell-time">
+                        <div class="row-line"><strong>Từ:</strong> ${formatDate(item.tu_ngay)}</div>
+                        <div class="row-line"><strong>Đến:</strong> ${formatDate(item.den_ngay)}</div>
+                        ${caNghiText ? `<div class="ca-nghi-line"><strong>Ca nghỉ:</strong> ${e(caNghiText)}</div>` : ''}
+                    </td>
+
+                    <td class="cell-sign">
+                        <div class="ly-do-text">${e(item.ly_do)}</div>
+                        ${buildSignBlock(signNguoiNghi, tenNguoiNghi, 'Chữ ký người nghỉ', 'Chưa ký')}
+                    </td>
+
+                    <td class="cell-sign">
+                        ${buildSignBlock(signTruongKhoa, tenTruongKhoa, 'Chữ ký Trưởng khoa', 'Chưa ký')}
+                    </td>
+
+                    <td class="cell-sign">
+                        ${buildSignBlock(signLanhDao, tenLanhDao, 'Chữ ký Lãnh đạo', 'Chưa ký')}
+                    </td>
+
+                    <td class="cell-num">${item.so_ngay}</td>
+                    <td class="cell-num">${soPhepConLai}</td>
+                    <td class="cell-date">
+                        ${ngayNop ? `<strong>${ngayNop}</strong>` : '&nbsp;'}
+                    </td>
+                </tr>`;
+        } else {
+            html += `
+                <tr>
+                    <td style="height: 90px;">&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>`;
+        }
+    }
+
+    return html;
+}
+
+/* ============================================================ RENDER ============================================================ */
+function renderPrint(payload) {
+    const leave            = payload.leave || {};
+    const capCho           = payload.cap_cho || {};
+    const quota            = payload.quota || {};
+    const year             = payload.year || new Date().getFullYear();
+    const prevYear         = payload.prev_year || (year - 1);
+    const hospitalName     = payload.hospital_name || 'BỆNH VIỆN TÂM TRÍ ĐỒNG THÁP';
+    
+    // ⭐ Nhận thông tin người duyệt động từ API
+    const approverTitle    = payload.approver_title || 'GIÁM ĐỐC';
+    const approverName     = payload.approver_name || payload.hospital_director || 'ThS. BS. Đinh Tấn Tài';
+    
+    const allLeaves        = payload.all_leaves || [];
+    const totalSlots       = payload.total_slots || 10;
+    const stats            = payload.stats || {};
+
+    const employeeName      = leave.ho_ten || capCho.ho_ten || '';
+    const defaultTruongKhoa = capCho.ho_ten || '';
+    const defaultLanhDao    = approverName || '';
+
+    document.title = `In Giấy Nghỉ Phép - ${leave.ho_ten || ''} (Năm ${year})`;
+
+    setHospitalName(hospitalName);
+    document.getElementById('year').textContent = year;
+
+    document.getElementById('capChoHoTen').textContent = capCho.ho_ten || '';
+    document.getElementById('capChoChucVu').textContent = getChucVuLabel(capCho.chuc_vu) || capCho.chuc_vu || '';
+    
+    // ⭐ Gán Title (Giám đốc / Phó Giám đốc) và Tên người duyệt
+    document.getElementById('approverTitle').textContent = approverTitle;
+    document.getElementById('hospitalDirector').textContent = approverName;
+
+    document.getElementById('quotaYear').textContent  = year;
+    document.getElementById('quotaYear2').textContent = year;
+    document.getElementById('prevYear').textContent   = prevYear;
+    document.getElementById('quotaPhepNam').textContent     = quota.phep_nam ?? 0;
+    document.getElementById('quotaThamNien').textContent    = quota.phep_tham_nien ?? 0;
+    document.getElementById('quotaChuyenSang').textContent  = quota.phep_chuyen_sang ?? 0;
+
+    // ⭐ Truyền thêm defaultTruongKhoa và defaultLanhDao
+    document.getElementById('ledgerBody').innerHTML = buildLedgerRows(allLeaves, totalSlots, employeeName, defaultTruongKhoa, defaultLanhDao);
+
+    const noteWrap = document.getElementById('printNote');
+    const noteText = document.getElementById('printNoteText');
+
+    if (noteWrap && noteText) {
+        const daysPrinted = stats.total_days_printed     ?? 0;
+        const maxQuota    = stats.max_days_quota         ?? 12;
+        const wasCut      = stats.was_cut                ?? false;
+        const confirmed   = stats.total_confirmed_leaves ?? 0;
+        const printed     = stats.total_printed_leaves   ?? 0;
+
+        let msg = '';
+        if (wasCut) {
+            msg = `Đã in ${printed}/${confirmed} đơn — Tổng ${daysPrinted}/${maxQuota} ngày phép năm. `
+                + `Các đơn vượt quá giới hạn ngày phép không được in.`;
+        } else if (printed > 0) {
+            msg = `Đã in ${printed} đơn — Tổng ${daysPrinted}/${maxQuota} ngày phép năm ${year}.`;
+        }
+
+        if (msg) {
+            noteText.textContent = msg;
+            noteWrap.style.display = 'block';
+        } else {
+            noteWrap.style.display = 'none';
+        }
+    }
+
+    const btnBack = document.getElementById('btnBack');
+    if (btnBack) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const fromPage = urlParams.get('from');
+        
+        if (fromPage) {
+            btnBack.href = fromPage;
+        } else if (document.referrer) {
+            try {
+                const refUrl = new URL(document.referrer);
+                if (refUrl.origin === window.location.origin) {
+                    btnBack.href = refUrl.pathname.split('/').pop() + refUrl.search;
+                } else {
+                    btnBack.href = leave.id ? `xemdonnghiphep.html?id=${leave.id}` : 'lichsudonnghiphep.html';
+                }
+            } catch(e) {
+                btnBack.href = leave.id ? `xemdonnghiphep.html?id=${leave.id}` : 'lichsudonnghiphep.html';
+            }
+        } else {
+            btnBack.href = leave.id ? `xemdonnghiphep.html?id=${leave.id}` : 'lichsudonnghiphep.html';
+        }
+    }
+}
+
+/* ============================================================ INIT ============================================================ */
+(async function init() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const id = parseInt(params.get('id') || '0', 10);
+
+        if (!id || id <= 0) {
+            showError('Mã giấy nghỉ phép không hợp lệ! URL phải có dạng: indanhsachdonnghiphep.html?id=5');
+            return;
+        }
+
+        const url = new URL(API.inData, window.location.href);
+        url.searchParams.set('id', id);
+
+        const res = await fetch(url.toString(), { credentials: 'include' });
+
+        if (res.status === 401) {
+            window.location.replace(API.loginPage);
+            return;
+        }
+
+        const rawText = await res.text();
+        if (!rawText) {
+            showError('Backend trả response rỗng.');
+            return;
+        }
+
+        let json;
+        try {
+            json = JSON.parse(rawText);
+        } catch (parseErr) {
+            showError('Backend KHÔNG trả JSON. Response: ' + rawText.substring(0, 200));
+            return;
+        }
+
+        if (!json.success) {
+            showError('Backend báo lỗi: ' + (json.message || json.error || 'Unknown'));
+            return;
+        }
+
+        const payload = unwrapPayload(json);
+        renderPrint(payload);
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('printArea').style.display = 'block';
+
+    } catch (err) {
+        console.error('[DEBUG] Exception:', err);
+        showError('Có lỗi xảy ra: ' + err.message);
+    }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,3039 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ý Kiến Trưởng Khoa / Phòng - Hệ Thống Quản Lý Giấy Nghỉ Phép</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ============================================================ GLOBAL ============================================================ */
+* { box-sizing: border-box; }
+body {
+    font-family: 'Times New Roman', Times, Georgia, serif;
+    background: #f4f8fd; color: #1e293b; margin: 0;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14.5px;
+}
+.app-wrapper { display: flex; min-height: 100vh; }
+.app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+/* SIDEBAR */
+.app-sidebar {
+    width: 320px; background: #fbfdff; border-right: 1px solid #e8f1fb;
+    height: 100vh; position: fixed; left: 0; top: 0;
+    display: flex; flex-direction: column; overflow: hidden;
+    z-index: 40; transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(.22,.9,.3,1);
+    box-shadow: 0 0 44px rgba(20, 60, 110, 0.12);
+}
+.app-sidebar.open { transform: translateX(0); }
+.sidebar-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 18px 18px; flex-shrink: 0;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #6FB4F0 0%, #4A90E2 100%);
+}
+.sidebar-header::after {
+    content: ""; position: absolute; right: -40px; top: -50px;
+    width: 140px; height: 140px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.10); pointer-events: none;
+}
+.sidebar-header > * { position: relative; z-index: 1; }
+
+.sidebar-logo {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(20, 60, 110, 0.18);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden; padding: 6px;
+}
+.sidebar-logo img { width: 100%; height: 100%; object-fit: contain; }
+
+.sidebar-brand-text { flex: 1; min-width: 0; text-align: center; padding-right: 8px; }
+.sidebar-title {
+    font-size: 12.5px; font-weight: 700; letter-spacing: -0.2px;
+    color: #fff; line-height: 1.3; word-break: break-word;
+}
+.sidebar-subtitle {
+    font-size: 11.5px; color: rgba(255, 255, 255, 0.9);
+    font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
+    margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sidebar-menu {
+    flex: 1; display: flex; flex-direction: column; gap: 3px;
+    padding: 8px 14px 12px; margin: 0; list-style: none;
+    overflow-y: auto; min-height: 0; scrollbar-width: none;
+}
+.sidebar-menu::-webkit-scrollbar { width: 0; }
+.menu-category {
+    padding: 18px 10px 8px;
+    font-size: 11.5px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: #a8c0d6; list-style: none;
+}
+.menu-category:first-child { padding-top: 12px; }
+.menu-item { list-style: none; }
+.menu-item a {
+    display: flex; align-items: center; gap: 13px;
+    padding: 12px 14px; border-radius: 12px;
+    color: #64748b; font-weight: 600; font-size: 15px;
+    text-decoration: none; transition: all 0.22s ease;
+    position: relative; line-height: 1.3;
+}
+.menu-item a i {
+    font-size: 16.5px; width: 20px;
+    text-align: center; flex-shrink: 0;
+    color: #94aecb;
+}
+.menu-item a > span:not(.menu-badge) {
+    flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.menu-item a:hover { background: #f0f7ff; color: #4A90E2; }
+.menu-item a:hover i { color: #5FA5EC; }
+.menu-item.active a {
+    background: linear-gradient(135deg, #eaf4ff 0%, #f5faff 100%);
+    color: #357ABD; box-shadow: inset 0 0 0 1px #d8e9fc;
+}
+.menu-item.active a i { color: #4A90E2; }
+.menu-item.active a::before {
+    content: ""; position: absolute;
+    left: -14px; top: 50%; transform: translateY(-50%);
+    width: 4px; height: 24px; border-radius: 0 4px 4px 0;
+    background: #5FA5EC;
+}
+.menu-item .menu-badge {
+    margin-left: auto;
+    background: #fff5e6; color: #d18f2b;
+    font-size: 12.5px; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px;
+    flex: 0 0 auto; display: inline-flex;
+    align-items: center; justify-content: center;
+    min-width: 26px; height: 22px;
+    line-height: 1; white-space: nowrap;
+}
+.sidebar-footer {
+    flex-shrink: 0; padding: 14px 16px 18px;
+    border-top: 1px solid #e8f1fb; background: #fbfdff;
+}
+.user-compact-info {
+    background: linear-gradient(140deg, #f2f8ff 0%, #fbfdff 100%);
+    border: 1px solid #dcecfb; border-radius: 14px;
+    padding: 12px 14px; transition: all 0.2s ease;
+}
+.user-compact-info:hover { border-color: #c9e0f9; }
+.user-compact-info .user-name {
+    font-size: 14.5px; font-weight: 700; color: #1e3a5f;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 3px;
+}
+.user-compact-info .user-role {
+    font-size: 12.5px; color: #8aa8c7;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sb-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.42); z-index: 35;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s; backdrop-filter: blur(2px);
+}
+.sb-overlay.show { opacity: 1; pointer-events: auto; }
+
+/* NAVBAR */
+.app-navbar {
+    height: 72px; background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e8f1fb;
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 30px; position: sticky; top: 0;
+    z-index: 20; flex-shrink: 0;
+}
+.btn-hamburger {
+    width: 42px; height: 42px; border-radius: 12px;
+    border: 1px solid #e8f1fb; background: #fff;
+    color: #4A90E2; font-size: 17px;
+    display: grid; place-items: center;
+    cursor: pointer;
+}
+.btn-hamburger:hover { background: #eaf4ff; border-color: #c9e0f9; }
+
+.notif-bell-btn {
+    width: 42px; height: 42px; border-radius: 12px;
+    border: 1px solid #c9e0f9;
+    background: linear-gradient(135deg, #eaf4ff 0%, #f5faff 100%);
+    color: #4A90E2; font-size: 16px;
+    display: grid; place-items: center;
+    cursor: pointer; position: relative; padding: 0;
+}
+.notif-bell-btn .notif-badge-count {
+    position: absolute; top: -5px; right: -5px;
+    min-width: 20px; height: 20px; padding: 0 6px;
+    background: #ef4444; color: #fff;
+    font-size: 0.75rem; font-weight: 700;
+    border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid #fff;
+}
+.notif-dropdown-menu {
+    width: 390px; max-width: calc(100vw - 28px);
+    padding: 0; border: none; border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.15);
+    margin-top: 8px;
+}
+.notif-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eef2f7;
+    background: #f8fbff;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.notif-header .title { font-weight: 700; color: #0f172a; }
+.notif-header .title i { color: #4A90E2; }
+.notif-header .mark-all-btn {
+    background: transparent; border: none;
+    color: #4A90E2; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; padding: 0;
+}
+.notif-scroll-container { max-height: 380px; overflow-y: auto; }
+.notif-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 16px; border-bottom: 1px solid #f1f5f9;
+    text-decoration: none; color: inherit; background: #f8fbff;
+}
+.notif-item:hover { background: #eef6ff; }
+.notif-item .notif-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 4px;
+}
+.notif-item .notif-body { flex: 1; min-width: 0; }
+.notif-item .notif-title { font-weight: 700; font-size: 0.95rem; }
+.notif-item .notif-content { color: #64748b; font-size: 0.88rem; margin-top: 4px; }
+.notif-item .notif-time { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; }
+.notif-empty-state { padding: 32px 20px; text-align: center; color: #94a3b8; }
+
+.user-nav-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 16px; border-radius: 999px;
+    border: 1px solid #e8f1fb; background: #fff;
+    cursor: pointer;
+}
+.user-nav-btn:hover { background: #f0f7ff; border-color: #c9e0f9; }
+.user-nav-btn .text-block { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
+.user-nav-btn .text-block .name { font-size: 14px; font-weight: 700; color: #0f172a; }
+.user-nav-btn .text-block .role { font-size: 12px; color: #94a3b8; }
+.user-nav-btn .chevron { color: #94a3b8; font-size: 11px; }
+
+.dropdown-header-user {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid #eef2f7;
+    background: #f8fbff;
+    border-radius: 12px 12px 0 0;
+}
+.dropdown-header-user .name { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.dropdown-header-user .role-badge-sm {
+    display: inline-block; padding: 2px 10px;
+    background: #eaf3fd; color: #1d6fc7;
+    font-size: 12px; font-weight: 600; border-radius: 20px;
+}
+.dropdown-header-user .dept { margin-top: 8px; font-size: 13.5px; color: #64748b; }
+.dropdown-header-user .dept i { color: #94a3b8; margin-right: 4px; }
+
+/* CONTENT */
+.content-body { flex: 1; padding: 28px 30px 44px; overflow-x: hidden; }
+
+/* TABS */
+.tabs-wrapper {
+    display: flex; gap: 6px; padding: 6px;
+    background: #fff; border: 1px solid #eef2f7;
+    border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    margin-bottom: 20px; flex-wrap: wrap;
+}
+.tab-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 10px;
+    font-size: 15px; font-weight: 600;
+    color: #64748b; text-decoration: none;
+    transition: all 0.2s;
+}
+.tab-link:hover { background: #f0f7ff; color: #4A90E2; }
+.tab-link.active {
+    background: linear-gradient(135deg, #5FA5EC, #4A90E2);
+    color: #fff; box-shadow: 0 4px 12px rgba(74, 144, 226, 0.28);
+}
+.scope-badge {
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; background: #f8fafc;
+    border: 1px solid #eef2f7; border-radius: 10px;
+    font-size: 14px; color: #475569;
+}
+.scope-badge strong { color: #0f172a; }
+
+/* FILTER */
+.filter-card {
+    background: #fff; border: 1px solid #eef2f7;
+    border-radius: 16px; padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    margin-bottom: 20px;
+}
+.filter-title {
+    font-size: 14px; font-weight: 700; color: #4A90E2;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px dashed #eef2f7;
+}
+.filter-form {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr auto;
+    gap: 12px; align-items: end;
+}
+.form-group-f { display: flex; flex-direction: column; gap: 6px; }
+.form-group-f label { font-size: 13px; font-weight: 600; color: #475569; }
+.form-control-f, .form-select-f {
+    padding: 10px 14px;
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    background: #f8fafc; font-family: inherit;
+    font-size: 14.5px; color: #1e293b;
+    outline: none; transition: all 0.2s; width: 100%;
+}
+.form-control-f:focus, .form-select-f:focus {
+    border-color: #4A90E2; background: #fff;
+    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.10);
+}
+.filter-actions { display: flex; gap: 8px; }
+
+.btn-f {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 16px; border-radius: 10px;
+    font-family: inherit; font-size: 14.5px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s ease;
+    white-space: nowrap; text-decoration: none;
+    border: 1px solid transparent; line-height: 1;
+}
+.btn-f-primary {
+    background: linear-gradient(135deg, #5FA5EC, #4A90E2);
+    color: #fff; box-shadow: 0 4px 12px rgba(74, 144, 226, 0.28);
+}
+.btn-f-primary:hover { transform: translateY(-1px); color: #fff; }
+.btn-f-outline {
+    background: #fff; color: #64748b; border-color: #e2e8f0;
+}
+.btn-f-outline:hover { background: #f8fafc; color: #4A90E2; border-color: #c9e0f9; }
+
+/* ⭐ BULK ACTION BAR */
+.bulk-action-bar {
+    display: none;
+    background: #fff;
+    border: 1px solid #c9e0f9;
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+    align-items: center;
+    justify-content: space-between;
+    animation: slideDown 0.3s ease;
+}
+.bulk-action-bar.show { display: flex; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.checkbox-custom { width: 18px; height: 18px; cursor: pointer; accent-color: #4A90E2; }
+
+/* CARD + TABLE */
+.card-modern {
+    border: none; border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    overflow: hidden; background: #fff;
+}
+.card-modern .card-header {
+    padding: 18px 24px; background: #fff;
+    border-bottom: 1px solid #eef2f7;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+}
+.card-modern .card-header h6 {
+    font-size: 16px; font-weight: 700; color: #0f172a;
+    display: flex; align-items: center; gap: 10px; margin: 0;
+}
+.card-modern .card-header h6 i { color: #4A90E2; }
+.count-pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 26px; height: 22px; padding: 0 9px;
+    background: #eaf3fd; color: #1d6fc7;
+    font-size: 12.5px; font-weight: 700;
+    border-radius: 20px;
+}
+
+.table-responsive { overflow-x: auto; }
+.table-custom {
+    margin-bottom: 0; width: 100%;
+    min-width: 1600px; border-collapse: collapse;
+}
+.table-custom thead th {
+    border-bottom: 1px solid #eef2f7;
+    font-weight: 700; letter-spacing: 0.6px;
+    font-size: 12.5px; color: #94a3b8;
+    text-transform: uppercase;
+    padding: 16px 18px;
+    white-space: nowrap; background: #fafbfd;
+    text-align: left; vertical-align: middle;
+}
+.table-custom tbody td {
+    padding: 18px; vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 15px; color: #1e293b;
+}
+.table-custom tbody tr:hover { background: #f8fafc; }
+.table-custom thead th:first-child,
+.table-custom tbody td:first-child { padding-left: 26px; }
+.table-custom thead th:last-child,
+.table-custom tbody td:last-child { padding-right: 26px; text-align: right; }
+
+/* ⭐ ĐÃ SỬA: Tăng độ rộng cột 11 để chứa 2 nút không bị vỡ */
+.table-custom thead th:nth-child(1),  .table-custom tbody td:nth-child(1)  { width: 40px;  min-width: 40px;  text-align: center; }
+.table-custom thead th:nth-child(2),  .table-custom tbody td:nth-child(2)  { width: 55px;  min-width: 55px;  text-align: center; }
+.table-custom thead th:nth-child(3),  .table-custom tbody td:nth-child(3)  { width: 130px; min-width: 130px; }
+.table-custom thead th:nth-child(4),  .table-custom tbody td:nth-child(4)  { width: 190px; min-width: 190px; }
+.table-custom thead th:nth-child(5),  .table-custom tbody td:nth-child(5)  { width: 170px; min-width: 170px; }
+.table-custom thead th:nth-child(6),  .table-custom tbody td:nth-child(6)  { width: 200px; min-width: 200px; }
+.table-custom thead th:nth-child(7),  .table-custom tbody td:nth-child(7)  { width: 90px;  min-width: 90px;  text-align: center; }
+.table-custom thead th:nth-child(8),  .table-custom tbody td:nth-child(8)  { width: 180px; min-width: 180px; }
+.table-custom thead th:nth-child(9),  .table-custom tbody td:nth-child(9)  { width: 140px; min-width: 140px; }
+.table-custom thead th:nth-child(10), .table-custom tbody td:nth-child(10) { width: 150px; min-width: 150px; }
+.table-custom thead th:nth-child(11), .table-custom tbody td:nth-child(11) { width: 280px; min-width: 280px; text-align: right; }
+
+.td-stt { font-weight: 600; color: #94a3b8; font-size: 14px; text-align: center; }
+.emp-name { font-weight: 700; color: #0f172a; font-size: 15px; margin-bottom: 4px; }
+.emp-role { font-size: 13.5px; color: #94a3b8; }
+.khoa-cell { color: #64748b; font-size: 14.5px; }
+.code-badge {
+    display: inline-block; background: #f1f5f9; color: #334155;
+    border: 1px solid #e2e8f0;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-weight: 600; font-size: 13px;
+    padding: 5px 10px; border-radius: 7px; white-space: nowrap;
+}
+.time-cell .time-main { font-weight: 600; color: #0f172a; font-size: 14.5px; }
+.time-cell .time-main i { color: #4A90E2; margin-right: 4px; }
+.time-cell .time-sub { font-size: 13.5px; color: #94a3b8; }
+.reason-text {
+    font-size: 14px; color: #64748b; max-width: 180px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;
+}
+.day-badge {
+    display: inline-block;
+    background: #eaf3fd; color: #1d6fc7;
+    border: 1px solid #c9e0f9;
+    font-weight: 700; font-size: 15px;
+    padding: 5px 14px; border-radius: 8px;
+    min-width: 52px; text-align: center;
+}
+.status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: 20px;
+    font-size: 13px; font-weight: 700; white-space: nowrap;
+}
+.sb-warning { background: #fff7ed; color: #c2410c; }
+.sb-info    { background: #eff6ff; color: #1d4ed8; }
+.sb-success { background: #ecfdf5; color: #047857; }
+.sb-danger  { background: #fef2f2; color: #b91c1c; }
+
+/* ⭐ ĐÃ SỬA: Thêm white-space: nowrap để nút không bị rớt dòng */
+.action-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 8px;
+    font-family: inherit; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s ease;
+    text-decoration: none; border: 1px solid transparent; line-height: 1;
+    white-space: nowrap; /* Ngăn chữ rớt dòng */
+}
+.action-btn-view {
+    background: #fff; color: #64748b; border-color: #e2e8f0;
+}
+.action-btn-view:hover { background: #eaf3fd; color: #1d6fc7; border-color: #c9e0f9; }
+.action-btn-opinion {
+    background: #fff8e6; color: #c67b12; border-color: #fce4b8;
+}
+.action-btn-opinion:hover { background: #fef4e5; color: #d18f2b; border-color: #f7d799; }
+
+.empty-state { padding: 60px 20px; text-align: center; color: #94a3b8; }
+.empty-state .empty-icon {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 38px; color: #059669; margin-bottom: 20px;
+}
+.empty-state .empty-title { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+.empty-state .empty-sub { font-size: 14.5px; color: #64748b; max-width: 400px; margin: 0 auto; }
+
+/* PAGINATION */
+.pagination-wrap {
+    padding: 18px 26px 22px;
+    border-top: 1px solid #eef2f7;
+    background: #fafbfd;
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 14px;
+}
+.pagination-info { font-size: 14px; color: #64748b; order: 2; margin-left: auto; }
+.pagination-info strong { color: #1e293b; }
+.pagination-bar {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 14px;
+    order: 1;
+}
+.page-btn {
+    min-width: 38px; height: 38px; padding: 0 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid #e5e7eb; border-radius: 9px;
+    background: #fff; color: #374151;
+    font-size: 15px; font-weight: 600;
+    text-decoration: none; transition: all 0.18s;
+}
+.page-btn:hover:not(.active):not(.disabled):not(.ellipsis) {
+    background: #f0f9f4; border-color: #bfe0cd; color: #4A7C59;
+}
+.page-btn.active {
+    background: #4A7C59; border-color: #4A7C59; color: #fff;
+    box-shadow: 0 3px 8px rgba(74, 124, 89, 0.28);
+}
+.page-btn.disabled {
+    background: #f9fafb; color: #cbd5e1; border-color: #f1f5f9;
+    pointer-events: none;
+}
+.page-btn.ellipsis {
+    border: none; background: transparent;
+    min-width: 24px; padding: 0 4px; color: #94a3b8;
+    pointer-events: none;
+}
+
+/* ============================================================ MODAL OPINION ============================================================ */
+.modal-opinion .modal-content {
+    border: none; border-radius: 20px; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+}
+.modal-opinion .modal-header {
+    padding: 18px 24px;
+    background: linear-gradient(135deg, #6FB4F0 0%, #4A90E2 100%);
+    border-bottom: none; color: #fff;
+}
+.modal-opinion .modal-title {
+    font-size: 16px; font-weight: 700; color: #fff;
+    margin: 0; display: flex; align-items: center; gap: 10px;
+}
+.modal-opinion .btn-close { filter: brightness(0) invert(1); opacity: 0.8; }
+.modal-opinion .modal-body { padding: 24px; background: #fff; max-height: 68vh; overflow-y: auto; }
+
+.leave-summary {
+    background: #f8fafc; border: 1px solid #eef2f7;
+    border-radius: 12px; padding: 14px 16px;
+    margin-bottom: 20px; font-size: 14.5px;
+}
+.leave-summary > div + div { margin-top: 6px; }
+.leave-summary strong { color: #0f172a; }
+.leave-summary .lbl { color: #64748b; }
+
+.form-label-c {
+    font-size: 14px; font-weight: 700; color: #334155;
+    margin-bottom: 8px; display: block;
+}
+.form-label-c .req { color: #ef4444; margin-left: 2px; }
+
+.modal-opinion textarea,
+.modal-opinion input[type="file"],
+.modal-opinion input[type="text"] {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-family: inherit; font-size: 15px; color: #1e293b;
+    outline: none; transition: all 0.2s;
+}
+.modal-opinion textarea:focus,
+.modal-opinion input[type="file"]:focus,
+.modal-opinion input[type="text"]:focus {
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.12);
+}
+.modal-opinion textarea { resize: vertical; min-height: 80px; }
+
+.sig-method-choice {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border: 1.5px solid #e2e8f0;
+    border-radius: 10px; background: #f8fafc;
+    cursor: pointer; transition: all 0.2s ease; user-select: none;
+}
+.sig-method-choice:hover { background: #eaf4ff; border-color: #c9e0f9; }
+.sig-method-choice.active {
+    background: #eaf4ff; border-color: #4A90E2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.12);
+}
+.sig-method-choice input[type="radio"] {
+    width: 16px; height: 16px; accent-color: #4A90E2;
+    cursor: pointer; flex-shrink: 0; margin: 0;
+}
+.sig-method-choice label {
+    flex: 1; font-size: 14.5px; font-weight: 600;
+    color: #1e293b; cursor: pointer; margin: 0;
+}
+.sig-method-choice label i { color: #4A90E2; margin-right: 5px; }
+
+.signature-area {
+    border: 2px dashed #cbd5e1; border-radius: 12px;
+    background: #f8fafc; padding: 4px; width: 100%;
+    transition: border-color 0.2s;
+}
+.signature-area:hover { border-color: #4A90E2; }
+.signature-box {
+    height: 170px; position: relative;
+    border-radius: 8px; background: #ffffff;
+    overflow: hidden; width: 100%;
+}
+.signature-box canvas {
+    width: 100%; height: 100%;
+    cursor: crosshair; display: block;
+    touch-action: none;
+}
+.signature-placeholder {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; color: #cbd5e1;
+    font-size: 13px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.signature-placeholder i { font-size: 22px; }
+
+.sig-toolbar {
+    display: flex; justify-content: flex-end;
+    padding: 8px 8px 4px;
+}
+.btn-clear-sig {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 8px;
+    background: #fef2f2; color: #dc2626;
+    border: 1px solid #fecaca;
+    font-size: 13.5px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-clear-sig:hover { background: #fee2e2; border-color: #fca5a5; }
+
+.sig-upload-preview {
+    margin-top: 12px; padding: 12px;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 10px; text-align: center;
+}
+.sig-upload-preview img {
+    max-height: 100px; max-width: 240px;
+    border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 3px; background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ⭐ NAME-BELOW-BOX */
+.name-below-box {
+    margin-top: 16px;
+    background: #f0f7ff; border: 1.5px solid #c9e0f9;
+    border-radius: 10px; padding: 12px 14px;
+}
+.name-below-box .name-below-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.name-below-box .form-label-c { margin-bottom: 0; color: #334155; }
+.name-below-box .lock-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; background: #dcfce7; color: #166534;
+    font-size: 11px; font-weight: 700; border-radius: 20px;
+}
+.name-below-box input {
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid #c9e0f9; border-radius: 10px;
+    background: #ffffff; font-family: inherit;
+    font-size: 15px; font-weight: 700; color: #0f172a;
+    outline: none; letter-spacing: 0.3px;
+}
+.name-below-box input:focus { border-color: #4A90E2; box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.12); }
+.name-below-box .hint {
+    font-size: 12.5px; color: #64748b;
+    margin-top: 6px; display: flex; align-items: center; gap: 4px;
+}
+
+.modal-opinion .modal-footer {
+    padding: 16px 24px; background: #fafbfd;
+    border-top: 1px solid #eef2f7;
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.btn-reject {
+    padding: 10px 20px; border-radius: 10px;
+    background: #fff; color: #dc2626; border: 1.5px solid #fecaca;
+    font-size: 14.5px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-reject:hover { background: #fef2f2; border-color: #fca5a5; }
+.btn-approve {
+    padding: 10px 24px; border-radius: 10px;
+    background: linear-gradient(135deg, #34d399, #22c55e);
+    color: #fff; border: none;
+    font-size: 14.5px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28);
+}
+.btn-approve:hover { transform: translateY(-1px); }
+.btn-approve:disabled, .btn-reject:disabled {
+    opacity: 0.6; cursor: not-allowed; transform: none;
+}
+
+/* ============================================================ MODAL PROFILE ============================================================ */
+.modal-profile .modal-content {
+    border: none; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+}
+.modal-profile .modal-header {
+    background: #ffffff; border-bottom: 1px solid #eef2f7;
+    padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.modal-profile .modal-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;
+}
+.modal-profile .title-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #eaf4ff; display: grid; place-items: center;
+    color: #4A90E2; font-size: 14px;
+}
+.modal-profile .btn-close-custom {
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: #f1f5f9; color: #64748b;
+    display: grid; place-items: center; cursor: pointer;
+}
+.modal-profile .profile-tabs {
+    display: flex; gap: 4px; padding: 0 18px;
+    border-bottom: 1px solid #eef2f7; background: #ffffff;
+}
+.modal-profile .profile-tab {
+    position: relative; padding: 10px 14px; border: none;
+    background: transparent; color: #94a3b8; font-size: 14px;
+    font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: inherit;
+}
+.modal-profile .profile-tab.active { color: #4A90E2; }
+.modal-profile .profile-tab.active::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 3px; background: #4A90E2;
+}
+.modal-profile .modal-body {
+    padding: 0; background: #ffffff; max-height: 60vh; overflow-y: auto;
+}
+.modal-profile .tab-pane {
+    display: none; padding: 18px 20px 20px;
+}
+.modal-profile .tab-pane.active { display: block; }
+
+.form-row-p {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px 14px; margin-bottom: 12px;
+}
+.form-row-p.full { grid-template-columns: 1fr; }
+.form-group-p { display: flex; flex-direction: column; gap: 5px; }
+.form-group-p label { font-size: 13.5px; font-weight: 600; color: #334155; }
+.form-group-p label .req { color: #ef4444; margin-left: 2px; }
+.form-group-p input {
+    width: 100%; padding: 9px 12px;
+    border: 1.5px solid #e2e8f0; border-radius: 8px;
+    background: #ffffff; font-family: inherit; font-size: 14px;
+    color: #1e293b; outline: none;
+}
+.form-group-p input:focus { border-color: #4A90E2; box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15); }
+.form-group-p input:disabled { background: #f8fafc; color: #64748b; cursor: not-allowed; }
+
+#inp_hoten { text-transform: uppercase; letter-spacing: 0.2px; }
+
+.form-group-p input.is-invalid,
+.form-group-p input.is-invalid:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+.form-group-p .field-error {
+    display: none; font-size: 12.5px; color: #dc2626;
+    margin-top: 2px; align-items: center; gap: 4px;
+}
+.form-group-p .field-error.show { display: flex; }
+.form-group-p .field-error i { font-size: 10px; }
+
+.reset-info-banner {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 8px;
+    font-size: 13.5px; margin-bottom: 12px;
+    background: #eaf4ff; border: 1px solid #c9e0f9; color: #357ABD;
+}
+.pw-rules {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 8px 12px;
+    margin-top: 6px; font-size: 12.5px;
+}
+.pw-rules .rule {
+    display: flex; align-items: center; gap: 6px;
+    padding: 2px 0; color: #94a3b8;
+}
+.pw-rules .rule i { width: 13px; font-size: 10px; color: #cbd5e1; }
+.pw-rules .rule.ok { color: #059669; }
+.pw-rules .rule.ok i { color: #22c55e; }
+
+.input-pw-wrap {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+.input-pw-wrap input {
+    padding-right: 42px !important;
+}
+.btn-toggle-pw-profile {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 14px;
+    line-height: 1;
+    transition: color 0.2s, background 0.2s;
+    z-index: 2;
+    border-radius: 6px;
+}
+.btn-toggle-pw-profile:hover {
+    color: #4A90E2;
+    background: #f1f5f9;
+}
+.btn-toggle-pw-profile:active {
+    transform: translateY(-50%) scale(0.92);
+}
+
+.modal-profile .modal-footer {
+    padding: 12px 20px; background: #ffffff;
+    border-top: 1px solid #eef2f7;
+    display: flex; justify-content: flex-end; gap: 10px;
+}
+.modal-profile .btn-cancel-p {
+    padding: 8px 18px; border: none; background: transparent;
+    color: #64748b; font-size: 14px; font-weight: 600;
+    border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.modal-profile .btn-cancel-p:hover { background: #f1f5f9; color: #334155; }
+.modal-profile .btn-save-p {
+    padding: 8px 20px; border: none;
+    background: linear-gradient(135deg, #5FA5EC 0%, #4A90E2 100%);
+    color: #ffffff; font-size: 14px; font-weight: 700;
+    border-radius: 8px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.28);
+}
+.modal-profile .btn-save-p:hover {
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    transform: translateY(-1px);
+}
+.modal-profile .btn-save-p:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* TOAST */
+.toast-container-custom {
+    position: fixed; right: 20px; bottom: 20px;
+    z-index: 9999; display: flex; flex-direction: column; gap: 10px;
+    pointer-events: none;
+}
+.toast-custom {
+    display: flex; align-items: flex-start; gap: 12px;
+    min-width: 300px; max-width: 420px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #5FA5EC 0%, #4A90E2 100%);
+    color: #fff; border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.35);
+    font-size: 14.5px; pointer-events: auto;
+    animation: toastSlideIn 0.35s cubic-bezier(.22,.9,.3,1);
+    position: relative; overflow: hidden;
+}
+.toast-custom.toast-error {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+}
+.toast-custom.toast-hide { animation: toastSlideOut 0.3s ease forwards; }
+.toast-custom .toast-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    display: grid; place-items: center; font-size: 15px;
+    flex-shrink: 0;
+}
+.toast-custom .toast-body { flex: 1; min-width: 0; }
+.toast-custom .toast-title { font-weight: 700; margin-bottom: 3px; }
+.toast-custom .toast-message { font-size: 13.5px; opacity: 0.92; word-break: break-word; }
+.toast-custom .toast-close {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,0.18); color: #fff;
+    cursor: pointer; display: grid; place-items: center; font-size: 10px;
+}
+@keyframes toastSlideIn { from { opacity: 0; transform: translateX(120%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastSlideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(120%); } }
+
+/* RESPONSIVE */
+@media (max-width: 1199.98px) {
+    .filter-form { grid-template-columns: 1fr 1fr; }
+    .filter-actions { grid-column: 1 / -1; justify-content: flex-end; }
+}
+@media (max-width: 991.98px) {
+    .app-navbar { padding: 0 18px; }
+    .content-body { padding: 20px 18px 40px; }
+    .pagination-wrap { flex-direction: column; align-items: stretch; }
+    .pagination-bar { align-self: flex-start; overflow-x: auto; }
+    .pagination-info { order: 3; margin-left: 0; text-align: center; }
+}
+@media (max-width: 767.98px) {
+    .filter-form { grid-template-columns: 1fr; }
+    .filter-actions { justify-content: stretch; }
+    .filter-actions .btn-f { flex: 1; justify-content: center; }
+    .form-row-p { grid-template-columns: 1fr; }
+    .tabs-wrapper { width: 100%; }
+    .tab-link { flex: 1; justify-content: center; font-size: 14px; padding: 10px 12px; }
+    .scope-badge { margin-left: 0; width: 100%; justify-content: center; }
+    .user-nav-btn .text-block { display: none; }
+    .notif-dropdown-menu { width: calc(100vw - 28px); }
+    .signature-box { height: 150px; }
+    .modal-opinion .modal-footer { flex-direction: column-reverse; }
+    .btn-approve, .btn-reject { width: 100%; justify-content: center; }
+}
+@media (max-width: 380px) {
+    .app-sidebar { width: 90vw; }
+}
+</style>
+</head>
+<body>
+
+<div class="toast-container-custom" id="toastContainer"></div>
+
+<div class="app-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar" id="appSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <img src="uploads/img/logo-tmmc.png" alt="Logo TMMC">
+            </div>
+            <div class="sidebar-brand-text">
+                <div class="sidebar-title">BỆNH VIỆN TÂM TRÍ ĐỒNG THÁP</div>
+                <div class="sidebar-subtitle">Tập đoàn Y khoa TMMC</div>
+            </div>
+        </div>
+        <ul class="sidebar-menu" id="sidebarMenu"></ul>
+        <div class="sidebar-footer">
+            <div class="user-compact-info">
+                <div class="user-name" id="sbUserName">Đang tải...</div>
+                <div class="user-role" id="sbUserRole">—</div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="sb-overlay" id="sbOverlay"></div>
+
+    <!-- MAIN -->
+    <div class="app-main">
+
+        <header class="app-navbar">
+            <button class="btn-hamburger" id="sidebarToggle" type="button" title="Mở menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div style="flex: 1;"></div>
+
+            <div class="d-flex align-items-center gap-3">
+
+                <!-- NOTIFICATIONS -->
+                <div class="dropdown">
+                    <button class="notif-bell-btn" type="button" id="btnNotificationBell"
+                            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <span class="notif-badge-count d-none" id="notifBadgeCount">0</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end notif-dropdown-menu">
+                        <div class="notif-header">
+                            <span class="title"><i class="fas fa-bell me-1"></i>Thông báo</span>
+                            <button type="button" class="mark-all-btn d-none" id="notifMarkAllBtn">
+                                <i class="fas fa-check-double me-1"></i>Đọc tất cả
+                            </button>
+                        </div>
+                        <div class="notif-scroll-container" id="notifScrollContainer">
+                            <div class="notif-empty-state">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <div class="mt-2">Đang tải...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USER -->
+                <div class="dropdown">
+                    <button class="user-nav-btn" type="button" data-bs-toggle="dropdown">
+                        <div class="text-block">
+                            <span class="name" id="navUserName">...</span>
+                            <span class="role" id="navUserRole">...</span>
+                        </div>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-0"
+                        style="min-width: 260px; border-radius: 12px; overflow: hidden;">
+                        <li class="dropdown-header-user">
+                            <div class="name" id="ddUserName">...</div>
+                            <div class="role-badge-sm" id="ddUserRole">...</div>
+                            <div class="dept">
+                                <i class="fas fa-building"></i>
+                                <span id="ddUserDept">Bộ phận chưa cập nhật</span>
+                            </div>
+                        </li>
+                        <li class="py-1">
+                            <a class="dropdown-item py-2 px-3 fw-medium text-dark" href="#"
+                               data-bs-toggle="modal" data-bs-target="#modalThongTinTaiKhoan" data-open-tab="info">
+                                <i class="fas fa-user-circle text-primary me-2" style="width:18px;"></i>Thông tin cá nhân
+                            </a>
+                        </li>
+                        <li class="pb-1">
+                            <a class="dropdown-item py-2 px-3 fw-medium text-dark" href="#"
+                               data-bs-toggle="modal" data-bs-target="#modalThongTinTaiKhoan" data-open-tab="password">
+                                <i class="fas fa-unlock-keyhole text-primary me-2" style="width:18px;"></i>Đổi mật khẩu
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-0"></li>
+                        <li class="py-1">
+                            <a class="dropdown-item py-2 px-3 fw-medium text-danger" href="#"
+                               data-bs-toggle="modal" data-bs-target="#modalXacNhanDangXuat">
+                                <i class="fas fa-arrow-right-from-bracket me-2" style="width:18px;"></i>Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-body">
+
+            <!-- TABS -->
+            <div class="tabs-wrapper">
+                <a class="tab-link" id="tabPending" href="?tab=pending">
+                    <i class="fas fa-clock"></i><span>Chờ Ý Kiến</span>
+                </a>
+                <a class="tab-link" id="tabAll" href="?tab=all">
+                    <i class="fas fa-list-check"></i><span>Lịch Sử</span>
+                </a>
+                <div class="scope-badge">
+                    <i class="fas fa-building"></i>
+                    <span>Phạm vi:</span>
+                    <strong id="scopeText">—</strong>
+                </div>
+            </div>
+
+            <!-- FILTER -->
+            <div class="filter-card">
+                <div class="filter-title">
+                    <i class="fas fa-filter"></i><span>Bộ lọc tìm kiếm</span>
+                </div>
+                <form id="filterForm" class="filter-form">
+                    <div class="form-group-f">
+                        <label>Tìm kiếm</label>
+                        <input type="text" name="keyword" id="filterKeyword"
+                               class="form-control-f" placeholder="Tìm theo tên nhân viên, mã nhân viên, mã đơn...">
+                    </div>
+                    <div class="form-group-f">
+                        <label>Trạng thái</label>
+                        <select name="status_filter" id="filterStatus" class="form-select-f">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="cho_truong_khoa">Chờ trưởng khoa</option>
+                            <option value="cho_phe_duyet">Chờ lãnh đạo</option>
+                            <option value="cho_huy">Chờ hủy</option>
+                            <option value="da_huy">Đã hủy</option>
+                            <option value="tu_choi">Từ chối</option>
+                        </select>
+                    </div>
+                    <div class="form-group-f">
+                        <label>Từ ngày</label>
+                        <input type="date" name="date_from" id="filterDateFrom" class="form-control-f">
+                    </div>
+                    <div class="form-group-f">
+                        <label>Đến ngày</label>
+                        <input type="date" name="date_to" id="filterDateTo" class="form-control-f">
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-f btn-f-primary">
+                            <i class="fas fa-search"></i> Lọc
+                        </button>
+                        <button type="button" class="btn-f btn-f-outline" id="btnResetFilter" title="Xóa lọc">
+                            <i class="fas fa-rotate-left"></i> Xóa
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ⭐ BULK ACTION BAR -->
+            <div class="bulk-action-bar" id="bulkActionBar">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary rounded-pill px-3 py-2 fs-6" id="bulkCountBadge">0</span>
+                    <span class="fw-bold text-dark">đơn nghỉ phép được chọn</span>
+                </div>
+                <button type="button" class="btn-f btn-f-primary" id="btnBulkApprove">
+                    <i class="fas fa-signature"></i> Duyệt đơn
+                </button>
+            </div>
+
+            <!-- TABLE -->
+            <div class="card card-modern">
+                <div class="card-header">
+                    <h6>
+                        <i class="fas fa-user-check"></i>
+                        <span id="tableTitle">Danh Sách Chờ Ý Kiến</span>
+                        <span class="count-pill" id="totalPill">0</span>
+                    </h6>
+                </div>
+
+                <div id="tableContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                        <div class="empty-title">Đang tải dữ liệu...</div>
+                    </div>
+                </div>
+
+                <div class="pagination-wrap d-none" id="paginationWrap">
+                    <div class="pagination-bar" id="paginationBar"></div>
+                    <div class="pagination-info" id="paginationInfo"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL Ý KIẾN — VẼ / UPLOAD + HỌ TÊN NGƯỜI KÝ
+     ============================================================ -->
+<div class="modal fade modal-opinion" id="modalOpinion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="formOpinion" enctype="multipart/form-data" novalidate>
+                <input type="hidden" name="don_id" id="opinionDonId" value="">
+                <input type="hidden" name="signature_method" id="signMethodInput" value="draw">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-pen-nib"></i>
+                        <span>Ý kiến Trưởng khoa — <span id="opinionMaDon">—</span></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="leave-summary">
+                        <div>
+                            <span class="lbl">Nhân viên:</span>
+                            <strong id="opinionHoTen">—</strong>
+                            <span id="opinionChucVu"></span>
+                        </div>
+                        <div>
+                            <span class="lbl">Thời gian:</span>
+                            <strong id="opinionThoiGian">—</strong>
+                            · <strong id="opinionSoNgay">—</strong>
+                        </div>
+                        <div>
+                            <span class="lbl">Lý do:</span>
+                            <strong id="opinionLyDo">—</strong>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label-c">
+                            Ý kiến của Trưởng khoa / Phòng <span class="req">*</span>
+                        </label>
+                        <textarea name="y_kien_truong_khoa" id="opinionYKien" rows="3"
+                                  placeholder="Nhập ý kiến..." required>Đồng ý</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label-c">
+                            Phương thức chữ ký <span class="req">*</span>
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <div class="sig-method-choice active" data-method="draw">
+                                    <input type="radio" name="sig_method_radio" id="sig_method_draw"
+                                           value="draw" checked>
+                                    <label for="sig_method_draw">
+                                        <i class="fas fa-pen-nib"></i> Vẽ trực tiếp
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="sig-method-choice" data-method="upload">
+                                    <input type="radio" name="sig_method_radio" id="sig_method_upload"
+                                           value="upload">
+                                    <label for="sig_method_upload">
+                                        <i class="fas fa-cloud-arrow-up"></i> Tải file ảnh
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sigDrawBox">
+                        <div class="signature-area">
+                            <div class="signature-box">
+                                <canvas id="signaturePad"></canvas>
+                                <div class="signature-placeholder" id="sigPlaceholder">
+                                    <i class="fas fa-pen-nib"></i>
+                                    <span>Vẽ chữ ký vào khung này</span>
+                                </div>
+                            </div>
+                            <div class="sig-toolbar">
+                                <button type="button" class="btn-clear-sig" id="btnClearSig">
+                                    <i class="fas fa-eraser"></i> Xóa vẽ lại
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sigUploadBox" class="d-none">
+                        <input type="file" name="file_chu_ky_truong_khoa" id="opinionFile"
+                               accept="image/png,image/jpeg,image/jpg,image/webp"
+                               class="form-control-f">
+                        <div class="form-text small text-muted mt-2">
+                            <i class="fas fa-circle-info text-info me-1"></i>
+                            Hỗ trợ PNG, JPG, WEBP (tối đa 2MB). Ảnh phải là chữ ký thực sự (không chứa chữ viết tay khác).
+                        </div>
+                        <div id="sigUploadPreview" class="sig-upload-preview d-none">
+                            <div class="small text-muted mb-2 fw-semibold" style="font-size:12px;">
+                                Xem trước ảnh chữ ký:
+                            </div>
+                            <img id="sigUploadImg" alt="preview">
+                        </div>
+                    </div>
+
+                    <div class="name-below-box">
+                        <div class="name-below-header">
+                            <label class="form-label-c" for="opinionHoTenKy">
+                                <i class="fas fa-user-pen"></i>
+                                Họ tên người ký <span class="req">*</span>
+                            </label>
+                            <span class="lock-badge">
+                                <i class="fas fa-keyboard"></i> Nhập trực tiếp
+                            </span>
+                        </div>
+                        <input type="text" id="opinionHoTenKy" maxlength="50"
+                               placeholder="VD: Nguyễn Văn A"
+                               autocomplete="off">
+                        <div class="hint">
+                            <i class="fas fa-circle-info text-info"></i>
+                            Họ tên sẽ được in <strong>riêng biệt</strong> bên dưới ảnh chữ ký (không nhúng vào ảnh).
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btnReject" class="btn-reject">
+                        <i class="fas fa-times"></i> TỪ CHỐI
+                    </button>
+                    <button type="button" id="btnApprove" class="btn-approve">
+                        <i class="fas fa-check"></i> ĐỒNG Ý
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     ⭐ MODAL DUYỆT HỦY ĐƠN — Trưởng khoa xử lý yêu cầu hủy
+     ============================================================ -->
+<div class="modal fade modal-opinion" id="modalCancelApproval" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <input type="hidden" id="cancelApprovalDonId" value="">
+
+            <div class="modal-header" style="background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);">
+                <h5 class="modal-title">
+                    <i class="fas fa-ban"></i>
+                    <span>Xử lý yêu cầu hủy — <span id="cancelApprovalMaDon">—</span></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="leave-summary">
+                    <div>
+                        <span class="lbl">Nhân viên:</span>
+                        <strong id="cancelApprovalHoTen">—</strong>
+                        <span id="cancelApprovalChucVu"></span>
+                    </div>
+                    <div>
+                        <span class="lbl">Thời gian:</span>
+                        <strong id="cancelApprovalThoiGian">—</strong>
+                        · <strong id="cancelApprovalSoNgay">—</strong>
+                    </div>
+                    <div>
+                        <span class="lbl">Lý do:</span>
+                        <strong id="cancelApprovalLyDo">—</strong>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-c">Ghi chú khi xử lý (không bắt buộc)</label>
+                    <textarea id="cancelApprovalNote" rows="3"
+                              placeholder="Nhập ghi chú (nếu có)..."></textarea>
+                </div>
+
+                <div class="alert alert-warning small mb-0" style="border-radius:10px;">
+                    <i class="fas fa-circle-info me-1"></i>
+                    <strong>Đồng ý hủy:</strong> Đơn chuyển sang trạng thái "Đã hủy" và không thể khôi phục.
+                    <br>
+                    <strong>Từ chối hủy:</strong> Đơn quay về trạng thái "Đã duyệt" ban đầu.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btnRejectCancel" class="btn-reject">
+                    <i class="fas fa-times"></i> TỪ CHỐI HỦY
+                </button>
+                <button type="button" id="btnApproveCancel" class="btn-approve"
+                        style="background: linear-gradient(135deg, #f87171, #ef4444);">
+                    <i class="fas fa-check"></i> ĐỒNG Ý HỦY
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL PROFILE
+     ============================================================ -->
+<div class="modal fade modal-profile" id="modalThongTinTaiKhoan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <span class="title-icon"><i class="fas fa-user-circle"></i></span>
+                    Thông tin cá nhân
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="profile-tabs">
+                <button type="button" class="profile-tab active" data-tab="info">
+                    <i class="fas fa-id-card"></i> Thông tin cá nhân
+                </button>
+                <button type="button" class="profile-tab" data-tab="password">
+                    <i class="fas fa-unlock-keyhole"></i> Đổi mật khẩu
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="tab-pane active" id="tab-info">
+                    <form id="formUpdateInfo" autocomplete="off" novalidate>
+                        <input type="hidden" name="csrf_token" id="csrfTokenInfo" value="">
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Họ và tên <span class="req">*</span></label>
+                                <input type="text" name="ho_ten" id="inp_hoten" maxlength="100" required>
+                                <div class="field-error" id="err_hoten">
+                                    <i class="fas fa-circle-exclamation"></i><span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Email</label>
+                                <input type="email" name="email" id="inp_email" maxlength="100">
+                                <div class="field-error" id="err_email">
+                                    <i class="fas fa-circle-exclamation"></i><span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row-p">
+                            <div class="form-group-p">
+                                <label>Ngày sinh</label>
+                                <input type="date" name="ngay_sinh" id="inp_ngaysinh">
+                                <div class="field-error" id="err_ngaysinh">
+                                    <i class="fas fa-circle-exclamation"></i><span></span>
+                                </div>
+                            </div>
+                            <div class="form-group-p">
+                                <label>Số điện thoại</label>
+                                <input type="tel" name="so_dien_thoai" id="inp_sdt" maxlength="15">
+                                <div class="field-error" id="err_sdt">
+                                    <i class="fas fa-circle-exclamation"></i><span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row-p">
+                            <div class="form-group-p">
+                                <label>Mã nhân viên</label>
+                                <input type="text" id="inp_manv" disabled>
+                            </div>
+                            <div class="form-group-p">
+                                <label>Khoa / Phòng ban</label>
+                                <input type="text" id="inp_khoa" disabled>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-pane" id="tab-password">
+                    <div class="reset-info-banner">
+                        <i class="fas fa-circle-info"></i>
+                        <span>Đặt lại mật khẩu mới cho tài khoản <strong id="resetUsernameLabel">của bạn</strong></span>
+                    </div>
+                    <form id="formChangePassword" autocomplete="off" novalidate>
+                        <input type="hidden" name="csrf_token" id="csrfTokenPassword" value="">
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Mật khẩu mới <span class="req">*</span></label>
+                                <div class="input-pw-wrap">
+                                    <input type="password" name="new_password" id="inp_newPw" minlength="6" required autocomplete="new-password">
+                                    <button type="button" class="btn-toggle-pw-profile" data-target="inp_newPw" title="Hiện/Ẩn mật khẩu">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="pw-rules" id="pwRules">
+                                    <div class="rule" data-rule="length"><i class="fas fa-circle"></i><span>Tối thiểu <strong>6 ký tự</strong></span></div>
+                                    <div class="rule" data-rule="upper"><i class="fas fa-circle"></i><span>Có ít nhất <strong>1 chữ in hoa</strong></span></div>
+                                    <div class="rule" data-rule="lower"><i class="fas fa-circle"></i><span>Có ít nhất <strong>1 chữ thường</strong></span></div>
+                                    <div class="rule" data-rule="number"><i class="fas fa-circle"></i><span>Có ít nhất <strong>1 chữ số</strong></span></div>
+                                    <div class="rule" data-rule="special"><i class="fas fa-circle"></i><span>Có ít nhất <strong>1 ký tự đặc biệt</strong></span></div>
+                                </div>
+                                <div class="field-error" id="err_newPw">
+                                    <i class="fas fa-circle-exclamation"></i><span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Xác nhận mật khẩu mới <span class="req">*</span></label>
+                                <div class="input-pw-wrap">
+                                    <input type="password" name="confirm_password" id="inp_confirmPw" minlength="6" required autocomplete="new-password">
+                                    <button type="button" class="btn-toggle-pw-profile" data-target="inp_confirmPw" title="Hiện/Ẩn mật khẩu">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="field-error" id="err_confirmPw">
+                                    <i class="fas fa-circle-exclamation"></i><span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel-p" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn-save-p" id="btnSaveProfile">
+                    <i class="fas fa-floppy-disk"></i>
+                    <span id="btnSaveLabel">Lưu thay đổi</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL LOGOUT -->
+<div class="modal fade" id="modalXacNhanDangXuat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden text-center p-3">
+            <div class="modal-body p-3">
+                <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width:55px;height:55px;">
+                    <i class="fas fa-arrow-right-from-bracket fs-4"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-2">Xác Nhận Đăng Xuất</h6>
+                <p class="text-muted small mb-0">Bạn có chắc muốn đăng xuất khỏi tài khoản này không?</p>
+            </div>
+            <div class="d-flex justify-content-center gap-2 pt-2 border-top">
+                <button type="button" class="btn btn-light rounded-pill px-3 btn-sm" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" id="btnConfirmLogout" class="btn btn-danger rounded-pill px-4 btn-sm fw-semibold">
+                    <i class="fas fa-arrow-right-from-bracket me-1"></i> Đăng xuất
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const CONFIG = {
+    API_HOME:        '../backend/api/trangchu.php',
+    API_NOTIF:       '../backend/api/thongbao.php',
+    API_LOGIN:       '../backend/api/dangnhap.php',
+    API_CSRF:        '../backend/api/csrf.php',
+    API_TRUONGKHOA:  '../backend/api/truongkhoaduyetdonnghiphep.php',
+    API_UPDATE_INFO: '../backend/api/capnhatthongtintaikhoan.php',
+    API_RESET_PW:    '../backend/api/datlaimatkhau.php',
+
+    LOGIN_PAGE:      'dangnhap.html',
+
+    ROUTES: {
+        home:            'trangchu.html',
+        taodon:          'taodonnghiphep.html',
+        lichsu:          'lichsudonnghiphep.html',
+        xemdon:          'xemdonnghiphep.html',
+        in:              'indanhsachdonnghiphep.html',
+        duyetTruongKhoa: 'truongkhoaduyetdonnghiphep.html',
+        duyetLanhDao:    'lanhdaoduyetdonnghiphep.html',
+        tiepNhan:        'tiepnhangiaynghiphep.html',
+        phepNam:         'quanlysophepduocnghi.html',
+        hoSo:            'hosonhansu.html',
+        baoCao:          'baocaothongkenghiphep.html'
+    }
+};
+
+const STATE = {
+    user: null,
+    csrfToken: '',
+    tab: 'pending',
+    pagination: null,
+    filters: { keyword: '', status_filter: '', date_from: '', date_to: '' },
+    badges: { pending_count: 0, personal_count: 0 }
+};
+
+/* ⭐ Mapping chức vụ */
+const CHUC_VU_MAP = {
+    'CEO': 'Giám đốc Điều hành',
+    'CMO': 'Giám đốc Chuyên môn',
+    'PGD': 'Phó Giám đốc',
+    'TRUONG_KHOA': 'Trưởng Khoa',
+    'PHO_KHOA': 'Phó Khoa',
+    'TRUONG_PHONG': 'Trưởng Phòng',
+    'PHO_PHONG': 'Phó Phòng',
+    'DIEU_DUONG_TRUONG_KHOA': 'Điều dưỡng trưởng Khoa',
+    'DIEU_DUONG_TRUONG_BV': 'Điều dưỡng trưởng Bệnh viện',
+    'BAC_SI_CHUYEN_KHOA': 'Bác sĩ Chuyên khoa',
+    'BAC_SI_DA_KHOA': 'Bác sĩ Đa khoa',
+    'BAC_SI_DIEU_TRI': 'Bác sĩ Điều trị',
+    'DIEU_DUONG': 'Điều dưỡng',
+    'NU_HO_SINH': 'Nữ hộ sinh',
+    'HO_LY': 'Hộ lý',
+    'KY_THUAT_VIEN': 'Kỹ thuật viên',
+    'DUOC_SI': 'Dược sĩ',
+    'DUOC_SI_LAM_SANG': 'Dược sĩ Lâm sàng',
+    'NHAN_VIEN_KE_TOAN': 'Nhân viên Kế toán',
+    'NHAN_VIEN_HANH_CHINH': 'Nhân viên Hành chính - Nhân sự',
+    'NHAN_VIEN_IT': 'Nhân viên Công nghệ thông tin',
+    'NHAN_VIEN_CSKH': 'Nhân viên Chăm sóc khách hàng',
+    'NHAN_VIEN_THU_NGAN': 'Nhân viên Thu ngân / Viện phí',
+    'Khác': 'Khác'
+};
+function getChucVuLabel(code) {
+    if (!code) return '';
+    return CHUC_VU_MAP[code] || code;
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function esc(s) {
+    if (s == null) return '';
+    return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function formatDate(s) {
+    if (!s || s === '0000-00-00') return '-';
+    const d = new Date(String(s).replace(' ', 'T'));
+    if (isNaN(d)) return '-';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${dd}/${mm}/${d.getFullYear()}`;
+}
+function formatDateTime(s) {
+    if (!s || s === '0000-00-00 00:00:00') return '-';
+    const d = new Date(String(s).replace(' ', 'T'));
+    if (isNaN(d)) return '-';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${d.getFullYear()} ${hh}:${mi}`;
+}
+function getBuoiNghiText(buoi) {
+    return {
+        'sang':    'Buổi sáng (0.5 ngày)',
+        'chieu':   'Buổi chiều (0.5 ngày)',
+        'ca_ngay': 'Nguyên ngày'
+    }[buoi] || 'Nguyên ngày';
+}
+function titleCaseVi(s) {
+    return String(s || '').trim().replace(/\s+/g, ' ').split(' ').map(w =>
+        w ? w.charAt(0).toLocaleUpperCase('vi-VN') + w.slice(1).toLocaleLowerCase('vi-VN') : ''
+    ).join(' ');
+}
+function getRoleLabel(role) {
+    const m = {
+        'admin': 'Quản trị hệ thống', 'nhan_vien': 'Nhân viên',
+        'truong_khoa': 'Trưởng khoa / Phòng', 'lanh_dao': 'Ban Giám Đốc / Lãnh đạo',
+        'nhan_su': 'Phòng Nhân sự', 'ban_lanh_dao': 'Ban Lãnh đạo',
+        'giam_doc': 'Giám đốc', 'giamdoc': 'Giám đốc',
+        'truongkhoa': 'Trưởng khoa / Phòng',
+        'nhansu': 'Phòng Nhân sự', 'nhanvien': 'Nhân viên'
+    };
+    return m[role] || 'Người dùng';
+}
+function isRole(role, ...names) { return names.includes(role); }
+
+function unwrapPayload(json) {
+    if (!json || typeof json !== 'object') return {};
+    if (json.data && typeof json.data === 'object' && !Array.isArray(json.data)) return json.data;
+    return json;
+}
+
+/* TOAST */
+function showToast(message, options = {}) {
+    const { title = 'Thành công', type = 'success', duration = 3500, icon = null } = options;
+    const container = document.getElementById('toastContainer');
+    if (!container) return null;
+    const defaultIcon = type === 'error' ? 'fa-circle-xmark' : 'fa-circle-check';
+    const toast = document.createElement('div');
+    toast.className = 'toast-custom' + (type === 'error' ? ' toast-error' : '');
+    toast.innerHTML = `
+        <div class="toast-icon"><i class="fas ${icon || defaultIcon}"></i></div>
+        <div class="toast-body">
+            <div class="toast-title">${esc(title)}</div>
+            <div class="toast-message">${esc(message)}</div>
+        </div>
+        <button class="toast-close" type="button"><i class="fas fa-times"></i></button>`;
+    container.appendChild(toast);
+    let closed = false;
+    const close = () => { if (closed) return; closed = true; toast.classList.add('toast-hide'); setTimeout(() => toast.remove(), 320); };
+    toast.querySelector('.toast-close').addEventListener('click', close);
+    if (duration > 0) setTimeout(close, duration);
+    return { close, element: toast };
+}
+
+/* ============================================================
+   CSRF
+   ============================================================ */
+async function loadCsrfToken() {
+    try {
+        const res = await fetch(CONFIG.API_CSRF, {
+            credentials: 'include',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (!res.ok) return '';
+        const data = await res.json();
+        const p = unwrapPayload(data);
+        if (p.csrf_token) {
+            STATE.csrfToken = p.csrf_token;
+            const a = document.getElementById('csrfTokenInfo');
+            const b = document.getElementById('csrfTokenPassword');
+            if (a) a.value = p.csrf_token;
+            if (b) b.value = p.csrf_token;
+        }
+    } catch (e) { console.warn('[CSRF]', e); }
+    return '';
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+function renderSidebarMenu() {
+    const role = STATE.user?.vai_tro || '';
+    const isAdmin      = isRole(role, 'admin');
+    const isLanhDao    = isRole(role, 'giam_doc', 'giamdoc', 'ban_lanh_dao', 'lanh_dao');
+    const isTruongKhoa = isRole(role, 'truong_khoa', 'truongkhoa');
+    const isNhanSu     = isRole(role, 'nhan_su', 'nhansu');
+
+    let html = '';
+    html += `<li class="menu-category">MENU CHỨC NĂNG</li>
+             <li class="menu-item"><a href="${CONFIG.ROUTES.home}"><i class="fas fa-th-large"></i><span>Tổng quan</span></a></li>`;
+
+    html += `<li class="menu-category">Nghỉ phép</li>`;
+
+    if (!isLanhDao) {
+        html += `<li class="menu-item"><a href="${CONFIG.ROUTES.taodon}"><i class="fas fa-file-circle-plus"></i><span>Tạo giấy nghỉ phép</span></a></li>`;
+    }
+
+    html += `<li class="menu-item"><a href="${CONFIG.ROUTES.lichsu}"><i class="fas fa-clock-rotate-left"></i><span>Lịch sử đã xin nghỉ</span>${STATE.badges.personal_count > 0 ? `<span class="menu-badge">${STATE.badges.personal_count}</span>` : ''}</a></li>`;
+
+    if (isTruongKhoa || isLanhDao || isAdmin) {
+        html += `<li class="menu-category">Phê duyệt</li>`;
+        if (isTruongKhoa || isAdmin) {
+            html += `<li class="menu-item active"><a href="${CONFIG.ROUTES.duyetTruongKhoa}"><i class="fas fa-user-check"></i><span>Trưởng khoa phê duyệt</span>${STATE.badges.pending_count > 0 ? `<span class="menu-badge">${STATE.badges.pending_count}</span>` : ''}</a></li>`;
+        }
+        if (isLanhDao || isAdmin) {
+            html += `<li class="menu-item"><a href="${CONFIG.ROUTES.duyetLanhDao}"><i class="fas fa-signature"></i><span>Lãnh đạo xét duyệt</span></a></li>`;
+        }
+    }
+
+    if (isNhanSu || isAdmin) {
+        html += `<li class="menu-category">Phòng nhân sự</li>
+                 <li class="menu-item"><a href="${CONFIG.ROUTES.tiepNhan}"><i class="fas fa-file-import"></i><span>Tiếp nhận đơn nghỉ</span></a></li>
+                 <li class="menu-item"><a href="${CONFIG.ROUTES.phepNam}"><i class="fas fa-calendar-check"></i><span>Quản lý ngày phép</span></a></li>
+                 <li class="menu-item"><a href="${CONFIG.ROUTES.hoSo}"><i class="fas fa-users"></i><span>Quản lý nhân viên</span></a></li>`;
+    }
+
+    if (isAdmin || isLanhDao || isNhanSu) {
+        html += `<li class="menu-category">Thống kê</li>
+                 <li class="menu-item"><a href="${CONFIG.ROUTES.baoCao}"><i class="fas fa-chart-line"></i><span>Báo cáo nghỉ phép</span></a></li>`;
+    }
+
+    document.getElementById('sidebarMenu').innerHTML = html;
+}
+
+/* ============================================================
+   FILL USER INFO
+   ============================================================ */
+function fillUserInfo() {
+    const u = STATE.user || {};
+    const name = u.ho_ten || u.username || 'Người dùng';
+    const role = getChucVuLabel(u.chuc_vu) || getRoleLabel(u.vai_tro);
+    const khoa = u.ten_khoa || '';
+
+    document.getElementById('sbUserName').textContent = name;
+    document.getElementById('sbUserRole').textContent = role + (khoa ? ' · ' + khoa : '');
+    document.getElementById('navUserName').textContent = name;
+    document.getElementById('navUserRole').textContent = getRoleLabel(u.vai_tro);
+    document.getElementById('ddUserName').textContent = name;
+    document.getElementById('ddUserRole').textContent = getRoleLabel(u.vai_tro);
+    document.getElementById('ddUserDept').textContent = khoa || 'Bộ phận chưa cập nhật';
+
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    setVal('inp_hoten', u.ho_ten ? String(u.ho_ten).toUpperCase() : '');
+    setVal('inp_email', u.email);
+    setVal('inp_ngaysinh', u.ngay_sinh);
+    setVal('inp_sdt', u.so_dien_thoai);
+    setVal('inp_manv', u.ma_nv || '---');
+    setVal('inp_khoa', u.ten_khoa || '---');
+}
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+async function checkAuth() {
+    try {
+        const res = await fetch(`${CONFIG.API_HOME}?action=check`, {
+            credentials: 'include',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (!data.logged_in) {
+            window.location.replace(CONFIG.LOGIN_PAGE);
+            return false;
+        }
+        STATE.user = data.employee
+            ? { ...data.user, ...data.employee, vai_tro: data.user.vai_tro, username: data.user.username }
+            : data.user;
+
+        const role = data.user.vai_tro || '';
+        if (!['truong_khoa', 'truongkhoa', 'admin'].includes(role)) {
+            alert('Bạn không có quyền truy cập chức năng này!');
+            window.location.replace(CONFIG.ROUTES.home);
+            return false;
+        }
+        return true;
+    } catch (e) {
+        console.error('[Auth]', e);
+        window.location.replace(CONFIG.LOGIN_PAGE);
+        return false;
+    }
+}
+
+/* ============================================================
+   NOTIFICATIONS
+   ============================================================ */
+function getNotifIcon(title) {
+    const t = String(title || '').toLowerCase();
+    if (t.includes('tiếp nhận'))       return { bg: '#ecfeff', color: '#06b6d4', icon: 'fa-inbox' };
+    if (t.includes('phê duyệt') || t.includes('đã duyệt')) return { bg: '#ecfdf5', color: '#10b981', icon: 'fa-check-circle' };
+    if (t.includes('từ chối'))         return { bg: '#fef2f2', color: '#ef4444', icon: 'fa-times-circle' };
+    if (t.includes('hủy'))             return { bg: '#fef2f2', color: '#dc2626', icon: 'fa-ban' };
+    if (t.includes('ý kiến'))          return { bg: '#fffbeb', color: '#f59e0b', icon: 'fa-comment-dots' };
+    if (t.includes('mật khẩu'))        return { bg: '#f5f3ff', color: '#7c3aed', icon: 'fa-key' };
+    return { bg: '#eff6ff', color: '#3b82f6', icon: 'fa-info-circle' };
+}
+
+function renderNotifItem(n) {
+    const ic = getNotifIcon(n.tieu_de);
+    return `
+        <div class="notif-item" data-id="${n.id}" style="cursor:pointer;">
+            <div class="notif-icon" style="background:${ic.bg};color:${ic.color};">
+                <i class="fas ${ic.icon}"></i>
+            </div>
+            <div class="notif-body">
+                <div class="notif-title">${esc(n.tieu_de)}</div>
+                <div class="notif-content">${esc(n.noi_dung)}</div>
+                <div class="notif-time"><i class="far fa-clock"></i> ${esc(n.created_at || '')}</div>
+            </div>
+        </div>`;
+}
+
+function updateNotifBadge(count) {
+    const badgeCount = document.getElementById('notifBadgeCount');
+    const markAllBtn = document.getElementById('notifMarkAllBtn');
+    if (count > 0) {
+        badgeCount.textContent = count > 99 ? '99+' : count;
+        badgeCount.classList.remove('d-none');
+        markAllBtn.classList.remove('d-none');
+    } else {
+        badgeCount.classList.add('d-none');
+        markAllBtn.classList.add('d-none');
+    }
+}
+
+async function loadNotifications() {
+    const container = document.getElementById('notifScrollContainer');
+    if (!container) return;
+    try {
+        const res = await fetch(`${CONFIG.API_NOTIF}?action=list&filter=unread`, {
+            credentials: 'include',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error();
+        const payload = json.data || json;
+        const unreadCount = Number(payload.unread_count || 0);
+        const list = payload.notifications || [];
+
+        updateNotifBadge(unreadCount);
+
+        if (list.length === 0) {
+            container.innerHTML = `<div class="notif-empty-state"><i class="fas fa-bell-slash"></i><div class="mt-2">Không có thông báo chưa đọc</div></div>`;
+            return;
+        }
+        container.innerHTML = list.map(renderNotifItem).join('');
+
+        container.querySelectorAll('.notif-item').forEach(el => {
+            el.addEventListener('click', () => markNotifRead(el, Number(el.dataset.id)));
+        });
+    } catch (e) {
+        container.innerHTML = `<div class="notif-empty-state"><i class="fas fa-bell-slash"></i><div class="mt-2">Không tải được thông báo</div></div>`;
+    }
+}
+
+async function markNotifRead(el, id) {
+    if (!id || el.dataset.processing === '1') return;
+    el.dataset.processing = '1';
+    el.style.transition = 'opacity .18s ease';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 180);
+
+    try {
+        const fd = new FormData();
+        fd.append('id', id);
+        if (STATE.csrfToken) fd.append('csrf_token', STATE.csrfToken);
+        const res = await fetch(`${CONFIG.API_NOTIF}?action=mark_read`, {
+            method: 'POST', body: fd, credentials: 'include',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const json = await res.json();
+        const payload = json.data || json;
+        if (payload && payload.unread_count !== undefined) {
+            updateNotifBadge(Number(payload.unread_count) || 0);
+        }
+    } catch (e) { console.error('[Notif]', e); }
+}
+
+function initNotifActions() {
+    document.body.addEventListener('click', async function (e) {
+        const btn = e.target.closest('#notifMarkAllBtn');
+        if (!btn) return;
+        try {
+            const fd = new FormData();
+            if (STATE.csrfToken) fd.append('csrf_token', STATE.csrfToken);
+            const res = await fetch(`${CONFIG.API_NOTIF}?action=mark_all_read`, {
+                method: 'POST', body: fd, credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const data = await res.json();
+            if (data.success) {
+                updateNotifBadge(0);
+                document.getElementById('notifScrollContainer').innerHTML =
+                    `<div class="notif-empty-state"><i class="fas fa-bell-slash"></i><div class="mt-2">Không có thông báo chưa đọc</div></div>`;
+            }
+        } catch (err) {}
+    });
+}
+
+/* SIDEBAR TOGGLE */
+(function () {
+    const sidebar = document.getElementById('appSidebar');
+    const overlay = document.getElementById('sbOverlay');
+    const btn = document.getElementById('sidebarToggle');
+    if (!sidebar || !overlay || !btn) return;
+    const open = () => { sidebar.classList.add('open'); overlay.classList.add('show'); };
+    const close = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+    btn.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
+    overlay.addEventListener('click', close);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+})();
+
+/* ============================================================
+   LOAD DANH SÁCH
+   ============================================================ */
+async function loadList() {
+    const container = document.getElementById('tableContainer');
+    container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div>
+            <div class="empty-title">Đang tải dữ liệu...</div>
+        </div>`;
+
+    const params = new URLSearchParams();
+    params.set('tab', STATE.tab);
+    if (STATE.filters.keyword)       params.set('keyword', STATE.filters.keyword);
+    if (STATE.filters.status_filter) params.set('status_filter', STATE.filters.status_filter);
+    if (STATE.filters.date_from)     params.set('date_from', STATE.filters.date_from);
+    if (STATE.filters.date_to)       params.set('date_to', STATE.filters.date_to);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    params.set('page', urlParams.get('page') || '1');
+
+    try {
+        const res = await fetch(`${CONFIG.API_TRUONGKHOA}?${params.toString()}`, {
+            credentials: 'include',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message || 'Lỗi tải dữ liệu');
+        const payload = unwrapPayload(json);
+
+        if (payload.user)   STATE.user   = { ...STATE.user, ...payload.user };
+        if (payload.badges) STATE.badges = payload.badges;
+
+        if (payload.scope) {
+            document.getElementById('scopeText').textContent =
+                payload.scope.is_admin ? 'Toàn Bệnh Viện' : (payload.scope.ten_khoa || '—');
+        }
+
+        document.getElementById('tableTitle').textContent =
+            STATE.tab === 'pending' ? 'Danh Sách Chờ Cho Ý Kiến' : 'Lịch Sử Đã Xử Lý';
+
+        if (payload.filters) {
+            STATE.filters = {
+                keyword:       payload.filters.keyword || '',
+                status_filter: payload.filters.status_filter || '',
+                date_from:     payload.filters.date_from || '',
+                date_to:       payload.filters.date_to || '',
+            };
+            document.getElementById('filterKeyword').value  = STATE.filters.keyword;
+            document.getElementById('filterStatus').value   = STATE.filters.status_filter;
+            document.getElementById('filterDateFrom').value = STATE.filters.date_from;
+            document.getElementById('filterDateTo').value   = STATE.filters.date_to;
+        }
+
+        renderList(payload.list || []);
+        STATE.pagination = payload.pagination;
+        renderPagination(payload.pagination);
+        document.getElementById('totalPill').textContent = payload.pagination?.total_rows || 0;
+        renderSidebarMenu();
+
+    } catch (e) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon" style="background:#fef2f2;color:#dc2626;">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div class="empty-title">Không thể tải dữ liệu</div>
+                <div class="empty-sub">${esc(e.message)}</div>
+            </div>`;
+    }
+}
+
+/* ============================================================
+   RENDER TABLE
+   ============================================================ */
+function renderList(list) {
+    const container = document.getElementById('tableContainer');
+    
+    // Reset bulk bar khi tải lại bảng
+    document.getElementById('bulkActionBar').classList.remove('show');
+    const checkAll = document.getElementById('checkAllRows');
+    if (checkAll) { checkAll.checked = false; checkAll.indeterminate = false; }
+
+    if (!list || list.length === 0) {
+        const hasFilter = STATE.filters.keyword || STATE.filters.status_filter
+                       || STATE.filters.date_from || STATE.filters.date_to;
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                <div class="empty-title">Không có dữ liệu</div>
+                <div class="empty-sub">
+                    ${hasFilter
+                        ? 'Không tìm thấy giấy nghỉ phép nào phù hợp với bộ lọc hiện tại.'
+                        : 'Hiện tại chưa có giấy nghỉ phép nào cần xử lý. Vui lòng quay lại sau.'}
+                </div>
+                ${hasFilter ? `<div class="mt-3"><button type="button" class="btn-f btn-f-outline" id="btnResetEmpty">
+                    <i class="fas fa-rotate-left"></i> Xóa bộ lọc</button></div>` : ''}
+            </div>`;
+
+        const btnResetEmpty = document.getElementById('btnResetEmpty');
+        if (btnResetEmpty) btnResetEmpty.addEventListener('click', resetFilter);
+        return;
+    }
+
+    const offset = STATE.pagination?.offset || 0;
+
+    const rowsHtml = list.map((row, idx) => {
+        const stt = offset + idx + 1;
+
+        // ⭐ Xử lý đủ các trạng thái mới
+        let badgeClass = 'sb-warning', badgeText = 'Chờ trưởng khoa', badgeIcon = 'fa-clock';
+        if (row.trang_thai === 'cho_phe_duyet') {
+            badgeClass = 'sb-info'; badgeText = 'Chờ lãnh đạo'; badgeIcon = 'fa-hourglass-half';
+        } else if (row.trang_thai === 'tu_choi') {
+            badgeClass = 'sb-danger'; badgeText = 'Từ chối'; badgeIcon = 'fa-circle-xmark';
+        } else if (row.trang_thai === 'cho_huy') {
+            badgeClass = 'sb-danger'; badgeText = 'Chờ hủy'; badgeIcon = 'fa-clock';
+        } else if (row.trang_thai === 'da_huy') {
+            badgeClass = 'sb-danger'; badgeText = 'Đã hủy'; badgeIcon = 'fa-ban';
+        } else if (row.trang_thai !== 'cho_truong_khoa') {
+            badgeClass = 'sb-success'; badgeText = 'Đã xử lý'; badgeIcon = 'fa-circle-check';
+        }
+
+        const canOpinion = row.trang_thai === 'cho_truong_khoa';
+        const canCancelApproval = row.trang_thai === 'cho_huy';
+        const xemdonUrl = `${CONFIG.ROUTES.xemdon}?id=${row.id}&from=truongkhoaduyetdonnghiphep.html`;
+
+        return `
+            <tr>
+                <td style="text-align: center;">
+                    <input type="checkbox" class="checkbox-custom row-checkbox" 
+                           data-id="${row.id}" 
+                           data-status="${row.trang_thai}"
+                           ${(canOpinion || canCancelApproval) ? '' : 'disabled title="Không thể chọn đơn này"'}>
+                </td>
+                <td class="td-stt">${stt}</td>
+                <td><span class="code-badge">${esc(row.ma_don)}</span></td>
+                <td>
+                    <div class="emp-name">${esc(row.ho_ten)}</div>
+                    <div class="emp-role">${esc(row.ma_nv)} · ${esc(getChucVuLabel(row.chuc_vu))}</div>
+                </td>
+                <td><span class="khoa-cell">${esc(row.ten_khoa)}</span></td>
+                <td>
+                    <div class="time-cell">
+                        <div class="time-main">
+                            <i class="far fa-calendar-alt"></i>
+                            ${formatDate(row.tu_ngay)} &rarr; ${formatDate(row.den_ngay)}
+                        </div>
+                        <span class="time-sub">(${esc(getBuoiNghiText(row.buoi_nghi))})</span>
+                    </div>
+                </td>
+                <td><span class="day-badge">${row.so_ngay}</span></td>
+                <td><span class="reason-text" title="${esc(row.ly_do)}">${esc(row.ly_do)}</span></td>
+                <td><span style="font-size:14px;color:#64748b;">${formatDateTime(row.created_at)}</span></td>
+                <td>
+                    <span class="status-badge ${badgeClass}">
+                        <i class="fas ${badgeIcon}"></i> ${badgeText}
+                    </span>
+                </td>
+                <td>
+                    <div class="d-flex gap-2 justify-content-end align-items-center">
+                        <a href="${xemdonUrl}" class="action-btn action-btn-view" title="Xem chi tiết">
+                            <i class="fas fa-eye"></i> Xem
+                        </a>
+                        ${canOpinion ? `
+                            <button type="button" class="action-btn action-btn-opinion btn-open-opinion"
+                                    data-id="${row.id}"
+                                    data-ma-don="${esc(row.ma_don)}"
+                                    data-ho-ten="${esc(row.ho_ten)}"
+                                    data-chuc-vu="${esc(row.chuc_vu)}"
+                                    data-ten-khoa="${esc(row.ten_khoa)}"
+                                    data-tu-ngay="${esc(row.tu_ngay)}"
+                                    data-den-ngay="${esc(row.den_ngay)}"
+                                    data-so-ngay="${row.so_ngay}"
+                                    data-ly-do="${esc(row.ly_do)}"
+                                    title="Cho ý kiến">
+                                <i class="fas fa-pen"></i> Ý kiến
+                            </button>` : ''}
+                        ${canCancelApproval ? `
+                            <button type="button" class="action-btn btn-open-cancel-approval"
+                                    data-id="${row.id}"
+                                    data-ma-don="${esc(row.ma_don)}"
+                                    data-ho-ten="${esc(row.ho_ten)}"
+                                    data-chuc-vu="${esc(row.chuc_vu)}"
+                                    data-ten-khoa="${esc(row.ten_khoa)}"
+                                    data-tu-ngay="${esc(row.tu_ngay)}"
+                                    data-den-ngay="${esc(row.den_ngay)}"
+                                    data-so-ngay="${row.so_ngay}"
+                                    data-ly-do="${esc(row.ly_do)}"
+                                    style="background:#fef2f2;color:#dc2626;border-color:#fecaca;"
+                                    title="Xử lý yêu cầu hủy">
+                                <i class="fas fa-ban"></i> Duyệt hủy
+                            </button>` : ''}
+                    </div>
+                </td>
+            </tr>`;
+    }).join('');
+
+    container.innerHTML = `
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 40px; text-align: center;">
+                            <input type="checkbox" class="checkbox-custom" id="checkAllRows">
+                        </th>
+                        <th>STT</th>
+                        <th>Mã Đơn</th>
+                        <th>Nhân Viên</th>
+                        <th>Phòng Khoa</th>
+                        <th>Thời Gian Nghỉ</th>
+                        <th>Số Ngày</th>
+                        <th>Lý Do</th>
+                        <th>Ngày Gửi</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>
+        </div>`;
+
+    container.querySelectorAll('.btn-open-opinion').forEach(btn => {
+        btn.addEventListener('click', () => openOpinionModal(btn.dataset));
+    });
+
+    container.querySelectorAll('.btn-open-cancel-approval').forEach(btn => {
+        btn.addEventListener('click', () => openCancelApprovalModal(btn.dataset));
+    });
+}
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+function renderPagination(pg) {
+    const wrap = document.getElementById('paginationWrap');
+    const bar  = document.getElementById('paginationBar');
+    const info = document.getElementById('paginationInfo');
+
+    if (!pg || pg.total_pages <= 1) {
+        wrap.classList.add('d-none');
+        return;
+    }
+    wrap.classList.remove('d-none');
+
+    const buildUrl = (p) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', STATE.tab);
+        url.searchParams.set('page', p);
+        if (STATE.filters.keyword)       url.searchParams.set('keyword', STATE.filters.keyword);
+        if (STATE.filters.status_filter) url.searchParams.set('status_filter', STATE.filters.status_filter);
+        if (STATE.filters.date_from)     url.searchParams.set('date_from', STATE.filters.date_from);
+        if (STATE.filters.date_to)       url.searchParams.set('date_to', STATE.filters.date_to);
+        return url.pathname + url.search;
+    };
+
+    let html = '';
+    html += pg.page > 1
+        ? `<a class="page-btn" href="${buildUrl(pg.page - 1)}"><i class="fas fa-chevron-left"></i></a>`
+        : `<span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span>`;
+
+    const start = Math.max(1, pg.page - 2);
+    const end   = Math.min(pg.total_pages, pg.page + 2);
+
+    if (start > 1) {
+        html += `<a class="page-btn" href="${buildUrl(1)}">1</a>`;
+        if (start > 2) html += `<span class="page-btn ellipsis">…</span>`;
+    }
+    for (let i = start; i <= end; i++) {
+        html += (i === pg.page)
+            ? `<span class="page-btn active">${i}</span>`
+            : `<a class="page-btn" href="${buildUrl(i)}">${i}</a>`;
+    }
+    if (end < pg.total_pages) {
+        if (end < pg.total_pages - 1) html += `<span class="page-btn ellipsis">…</span>`;
+        html += `<a class="page-btn" href="${buildUrl(pg.total_pages)}">${pg.total_pages}</a>`;
+    }
+
+    html += pg.page < pg.total_pages
+        ? `<a class="page-btn" href="${buildUrl(pg.page + 1)}"><i class="fas fa-chevron-right"></i></a>`
+        : `<span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span>`;
+
+    bar.innerHTML = html;
+
+    const from = (pg.page - 1) * pg.per_page + 1;
+    const to   = Math.min(pg.page * pg.per_page, pg.total_rows);
+    info.innerHTML = `Hiển thị <strong>${from}</strong>–<strong>${to}</strong> trên <strong>${pg.total_rows}</strong> bản ghi`;
+}
+
+/* ============================================================
+   SIGNATURE PAD
+   ============================================================ */
+let sigCanvas, sigCtx;
+let sigDrawing = false;
+let sigHasDrawn = false;
+let sigUploadedFile = null;
+
+function initSignaturePad() {
+    sigCanvas = document.getElementById('signaturePad');
+    if (!sigCanvas) return;
+    sigCtx = sigCanvas.getContext('2d');
+    resizeSigCanvas();
+    window.addEventListener('resize', resizeSigCanvas);
+
+    sigCanvas.addEventListener('mousedown', sigStartDraw);
+    sigCanvas.addEventListener('mousemove', sigDraw);
+    sigCanvas.addEventListener('mouseup', sigStopDraw);
+    sigCanvas.addEventListener('mouseleave', sigStopDraw);
+    sigCanvas.addEventListener('touchstart', sigStartDraw, { passive: false });
+    sigCanvas.addEventListener('touchmove', sigDraw, { passive: false });
+    sigCanvas.addEventListener('touchend', sigStopDraw);
+
+    document.getElementById('btnClearSig')?.addEventListener('click', clearSignature);
+}
+
+function resizeSigCanvas() {
+    if (!sigCanvas) return;
+    const rect = sigCanvas.parentElement.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const dpr = window.devicePixelRatio || 1;
+    const imgData = sigHasDrawn ? sigCanvas.toDataURL() : null;
+
+    sigCanvas.width = rect.width * dpr;
+    sigCanvas.height = rect.height * dpr;
+    sigCanvas.style.width = rect.width + 'px';
+    sigCanvas.style.height = rect.height + 'px';
+    sigCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    sigCtx.strokeStyle = '#0f172a';
+    sigCtx.lineWidth = 2.5;
+    sigCtx.lineCap = 'round';
+    sigCtx.lineJoin = 'round';
+
+    if (sigHasDrawn && imgData) {
+        const img = new Image();
+        img.onload = () => sigCtx.drawImage(img, 0, 0, rect.width, rect.height);
+        img.src = imgData;
+    }
+}
+
+function getSigPos(e) {
+    const rect = sigCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
+}
+
+function sigStartDraw(e) {
+    e.preventDefault();
+    sigDrawing = true;
+    const pos = getSigPos(e);
+    sigCtx.beginPath();
+    sigCtx.moveTo(pos.x, pos.y);
+    const ph = document.getElementById('sigPlaceholder');
+    if (ph) ph.style.display = 'none';
+    sigHasDrawn = true;
+}
+
+function sigDraw(e) {
+    if (!sigDrawing) return;
+    e.preventDefault();
+    const pos = getSigPos(e);
+    sigCtx.lineTo(pos.x, pos.y);
+    sigCtx.stroke();
+}
+
+function sigStopDraw() {
+    if (!sigDrawing) return;
+    sigDrawing = false;
+    sigCtx.closePath();
+}
+
+function clearSignature() {
+    if (!sigCanvas) return;
+    sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+    sigHasDrawn = false;
+    const ph = document.getElementById('sigPlaceholder');
+    if (ph) ph.style.display = '';
+}
+
+function buildSignatureData() {
+    const OUT_W = 500;
+    const OUT_H = 200;
+
+    const cnv = document.createElement('canvas');
+    cnv.width = OUT_W;
+    cnv.height = OUT_H;
+    const ctx = cnv.getContext('2d');
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, OUT_W, OUT_H);
+
+    if (sigHasDrawn && sigCanvas) {
+        ctx.drawImage(
+            sigCanvas,
+            0, 0, sigCanvas.width, sigCanvas.height,
+            20, 10, OUT_W - 40, OUT_H - 20
+        );
+    }
+
+    return cnv.toDataURL('image/png');
+}
+
+function initSignatureMethod() {
+    const choices = document.querySelectorAll('.sig-method-choice');
+    const radios  = document.querySelectorAll('input[name="sig_method_radio"]');
+    const drawBox   = document.getElementById('sigDrawBox');
+    const uploadBox = document.getElementById('sigUploadBox');
+    const sigInput  = document.getElementById('signMethodInput');
+
+    function updateMethod(method) {
+        choices.forEach(c => c.classList.toggle('active', c.dataset.method === method));
+        if (method === 'upload') {
+            drawBox?.classList.add('d-none');
+            uploadBox?.classList.remove('d-none');
+        } else {
+            uploadBox?.classList.add('d-none');
+            drawBox?.classList.remove('d-none');
+            setTimeout(resizeSigCanvas, 50);
+        }
+        if (sigInput) sigInput.value = method;
+    }
+
+    radios.forEach(r => r.addEventListener('change', () => updateMethod(r.value)));
+
+    choices.forEach(c => c.addEventListener('click', (e) => {
+        if (e.target.tagName === 'LABEL' || e.target.tagName === 'INPUT') return;
+        const radio = c.querySelector('input[type="radio"]');
+        if (radio) { radio.checked = true; updateMethod(radio.value); }
+    }));
+
+    const checked = document.querySelector('input[name="sig_method_radio"]:checked');
+    if (checked) updateMethod(checked.value);
+}
+
+function initSignatureUpload() {
+    const fileInput = document.getElementById('opinionFile');
+    const previewBox = document.getElementById('sigUploadPreview');
+    const previewImg = document.getElementById('sigUploadImg');
+
+    fileInput?.addEventListener('change', function () {
+        const file = this.files?.[0];
+        sigUploadedFile = null;
+
+        if (!file) {
+            previewBox?.classList.add('d-none');
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            showToast('File không phải là ảnh.', { type: 'error', title: 'Lỗi' });
+            this.value = '';
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            showToast('File ảnh quá lớn (tối đa 2MB).', { type: 'error', title: 'Lỗi' });
+            this.value = '';
+            return;
+        }
+
+        sigUploadedFile = file;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (previewImg) previewImg.src = e.target.result;
+            previewBox?.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function openOpinionModal(data) {
+    document.getElementById('opinionDonId').value = data.id || '';
+    document.getElementById('opinionMaDon').textContent = data.maDon || '';
+    document.getElementById('opinionHoTen').textContent = data.hoTen || '';
+    document.getElementById('opinionChucVu').textContent =
+        data.chucVu ? `(${getChucVuLabel(data.chucVu)} · ${data.tenKhoa})` : '';
+    document.getElementById('opinionThoiGian').textContent =
+        `${formatDate(data.tuNgay)} → ${formatDate(data.denNgay)}`;
+    document.getElementById('opinionSoNgay').textContent = `${data.soNgay} ngày`;
+    document.getElementById('opinionLyDo').textContent = data.lyDo || '';
+    document.getElementById('opinionYKien').value = 'Đồng ý';
+
+    const hoTen = STATE.user?.ho_ten || '';
+    const hoTenInput = document.getElementById('opinionHoTenKy');
+    if (hoTenInput) {
+        hoTenInput.value = hoTen ? titleCaseVi(hoTen) : '';
+    }
+
+    sigUploadedFile = null;
+    const fileEl = document.getElementById('opinionFile');
+    if (fileEl) fileEl.value = '';
+    document.getElementById('sigUploadPreview')?.classList.add('d-none');
+
+    const modalEl = document.getElementById('modalOpinion');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+
+    const drawRadio = document.getElementById('sig_method_draw');
+    if (drawRadio) {
+        drawRadio.checked = true;
+        drawRadio.dispatchEvent(new Event('change'));
+    }
+
+    setTimeout(() => {
+        clearSignature();
+        resizeSigCanvas();
+    }, 250);
+}
+
+/* ============================================================
+   ⭐ BULK APPROVAL LOGIC
+   ============================================================ */
+let bulkSelectedIds = [];
+let isBulkMode = false;
+
+// 1. Xử lý sự kiện Tick chọn
+document.addEventListener('change', function(e) {
+    if (e.target.id === 'checkAllRows') {
+        const isChecked = e.target.checked;
+        document.querySelectorAll('.row-checkbox:not(:disabled)').forEach(cb => {
+            cb.checked = isChecked;
+        });
+        updateBulkBar();
+    } else if (e.target.classList.contains('row-checkbox')) {
+        updateBulkBar();
+        
+        // Cập nhật trạng thái của Check All
+        const allCbs = document.querySelectorAll('.row-checkbox:not(:disabled)');
+        const checkedCbs = document.querySelectorAll('.row-checkbox:not(:disabled):checked');
+        const checkAll = document.getElementById('checkAllRows');
+        if (checkAll) {
+            checkAll.checked = allCbs.length > 0 && allCbs.length === checkedCbs.length;
+            checkAll.indeterminate = checkedCbs.length > 0 && checkedCbs.length < allCbs.length;
+        }
+    }
+});
+
+// 2. Cập nhật thanh Bulk Action
+function updateBulkBar() {
+    const checkedCbs = document.querySelectorAll('.row-checkbox:checked');
+    bulkSelectedIds = Array.from(checkedCbs).map(cb => parseInt(cb.dataset.id));
+    
+    const bar = document.getElementById('bulkActionBar');
+    const badge = document.getElementById('bulkCountBadge');
+    const btn = document.getElementById('btnBulkApprove');
+    
+    if (bulkSelectedIds.length > 0) {
+        bar.classList.add('show');
+        badge.textContent = bulkSelectedIds.length;
+        
+        // Kiểm tra xem có đơn chờ hủy nào bị chọn không
+        const hasCancel = Array.from(checkedCbs).some(cb => cb.dataset.status === 'cho_huy');
+        btn.innerHTML = hasCancel 
+            ? '<i class="fas fa-ban"></i> Duyệt hủy đơn' 
+            : '<i class="fas fa-signature"></i> Duyệt đơn';
+    } else {
+        bar.classList.remove('show');
+    }
+}
+
+// 3. Mở Modal Duyệt Hàng Loạt
+document.getElementById('btnBulkApprove')?.addEventListener('click', () => {
+    const checkedCbs = document.querySelectorAll('.row-checkbox:checked');
+    if (checkedCbs.length === 0) return;
+
+    const statuses = Array.from(checkedCbs).map(cb => cb.dataset.status);
+    const allCancel = statuses.every(s => s === 'cho_huy');
+    const allPending = statuses.every(s => s === 'cho_truong_khoa');
+
+    if (!allCancel && !allPending) {
+        showToast('Vui lòng chỉ chọn các đơn có cùng trạng thái để thao tác hàng loạt.', { type: 'warning', title: 'Cảnh báo' });
+        return;
+    }
+
+    if (allCancel) {
+        // Xử lý duyệt hủy hàng loạt
+        if (!confirm(`Bạn có chắc chắn muốn ĐỒNG Ý HỦY ${checkedCbs.length} đơn nghỉ phép này?`)) return;
+        processBulkCancel(Array.from(checkedCbs).map(cb => parseInt(cb.dataset.id)));
+    } else {
+        // Xử lý duyệt ý kiến hàng loạt (Mở Modal)
+        isBulkMode = true;
+        document.getElementById('opinionDonId').value = ''; 
+        document.getElementById('opinionMaDon').textContent = `Hàng loạt (${checkedCbs.length} đơn)`;
+        document.getElementById('opinionHoTen').textContent = 'Nhiều nhân viên';
+        document.getElementById('opinionChucVu').textContent = '';
+        document.getElementById('opinionThoiGian').textContent = `Bao gồm ${checkedCbs.length} đơn nghỉ phép`;
+        document.getElementById('opinionSoNgay').textContent = '---';
+        document.getElementById('opinionLyDo').textContent = 'Vui lòng nhập ý kiến chung cho các đơn này.';
+        document.getElementById('opinionYKien').value = 'Đồng ý';
+        
+        const hoTenInput = document.getElementById('opinionHoTenKy');
+        hoTenInput.value = STATE.user?.ho_ten ? titleCaseVi(STATE.user.ho_ten) : '';
+
+        sigUploadedFile = null;
+        const fileEl = document.getElementById('opinionFile');
+        if (fileEl) fileEl.value = '';
+        document.getElementById('sigUploadPreview')?.classList.add('d-none');
+
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalOpinion'));
+        modal.show();
+
+        const drawRadio = document.getElementById('sig_method_draw');
+        if (drawRadio) {
+            drawRadio.checked = true;
+            drawRadio.dispatchEvent(new Event('change'));
+        }
+        setTimeout(() => { clearSignature(); resizeSigCanvas(); }, 250);
+    }
+});
+
+// ⭐ Reset biến isBulkMode khi đóng modal thủ công
+document.getElementById('modalOpinion')?.addEventListener('hidden.bs.modal', function () {
+    isBulkMode = false;
+    document.getElementById('opinionDonId').value = ''; 
+});
+
+async function processBulkCancel(ids) {
+    const btn = document.getElementById('btnBulkApprove');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+    btn.disabled = true;
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const id of ids) {
+        const fd = new FormData();
+        fd.set('don_id', id);
+        fd.set('action_cancel_approval', 'approve'); // đồng ý hủy
+        fd.set('ghi_chu', 'Duyệt hàng loạt');
+        fd.set('csrf_token', STATE.csrfToken);
+
+        try {
+            const res = await fetch(CONFIG.API_TRUONGKHOA, {
+                method: 'POST',
+                body: fd,
+                credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const data = await res.json();
+            if (data.success) successCount++;
+            else failCount++;
+        } catch (e) {
+            failCount++;
+        }
+    }
+
+    btn.innerHTML = oldText;
+    btn.disabled = false;
+
+    if (successCount > 0) {
+        let msg = `Đã duyệt hủy thành công ${successCount} đơn.`;
+        if (failCount > 0) msg += ` Có ${failCount} đơn lỗi.`;
+        showToast(msg, { title: 'Thành công', type: 'success' });
+        
+        // reset checkbox
+        document.getElementById('checkAllRows').checked = false;
+        document.getElementById('checkAllRows').indeterminate = false;
+        updateBulkBar();
+        await loadList();
+    } else {
+        showToast('Không thể xử lý đơn nào.', { type: 'error', title: 'Lỗi' });
+    }
+}
+
+/* ============================================================
+   SUBMIT OPINION
+   ============================================================ */
+async function submitOpinion(action) {
+    const donId = document.getElementById('opinionDonId').value;
+    const yKien = document.getElementById('opinionYKien').value.trim();
+    const method = document.querySelector('input[name="sig_method_radio"]:checked')?.value || 'draw';
+    const hoTenKy = document.getElementById('opinionHoTenKy').value.trim();
+
+    // Validate chung
+    if (!hoTenKy) {
+        showToast('Vui lòng nhập họ tên người ký.', { type: 'error', title: 'Thiếu thông tin' });
+        document.getElementById('opinionHoTenKy').focus();
+        return;
+    }
+    if (!/^[\p{L}\s]+$/u.test(hoTenKy)) {
+        showToast('Họ tên chỉ được chứa chữ cái và khoảng trắng.', { type: 'error', title: 'Lỗi' });
+        return;
+    }
+    if (hoTenKy.length > 50) {
+        showToast('Họ tên quá dài (tối đa 50 ký tự).', { type: 'error', title: 'Lỗi' });
+        return;
+    }
+    if (!yKien) {
+        showToast('Vui lòng nhập ý kiến.', { type: 'error', title: 'Thiếu thông tin' });
+        return;
+    }
+
+    let sigData = '';
+    if (method === 'draw') {
+        if (!sigHasDrawn) {
+            showToast('Vui lòng vẽ chữ ký vào khung.', { type: 'error', title: 'Thiếu chữ ký' });
+            return;
+        }
+        sigData = buildSignatureData();
+    } else {
+        if (!sigUploadedFile) {
+            showToast('Vui lòng chọn file ảnh chữ ký.', { type: 'error', title: 'Thiếu chữ ký' });
+            return;
+        }
+    }
+
+    if (action === 'reject' && !isBulkMode) {
+        if (!confirm('Bạn có chắc chắn muốn TỪ CHỐI giấy nghỉ phép này?')) return;
+    } else if (action === 'reject' && isBulkMode) {
+        if (!confirm(`Bạn có chắc chắn muốn TỪ CHỐI ${bulkSelectedIds.length} giấy nghỉ phép này?`)) return;
+    }
+
+    const btnApprove = document.getElementById('btnApprove');
+    const btnReject  = document.getElementById('btnReject');
+    btnApprove.disabled = true;
+    btnReject.disabled  = true;
+    const originalApproveText = btnApprove.innerHTML;
+    const originalRejectText = btnReject.innerHTML;
+    btnApprove.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+    btnReject.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+    // ⭐ XÁC ĐỊNH DANH SÁCH ID CẦN DUYỆT
+    const idsToProcess = isBulkMode ? bulkSelectedIds : [parseInt(donId)];
+
+    let successCount = 0;
+    let failCount = 0;
+
+    // Duyệt tuần tự qua từng đơn (Tránh quá tải server và dễ xử lý lỗi)
+    for (const currentId of idsToProcess) {
+        const fd = new FormData();
+        fd.set('don_id', currentId);
+        fd.set('y_kien_truong_khoa', yKien);
+        fd.set('action_approval', action);
+        fd.set('signature_method', method);
+        fd.set('csrf_token', STATE.csrfToken);
+        fd.set('ho_ten_nguoi_ky_truong_khoa', hoTenKy);
+
+        if (method === 'draw') {
+            fd.set('chu_ky_base64', sigData);
+        } else if (sigUploadedFile) {
+            fd.set('file_chu_ky_truong_khoa', sigUploadedFile, sigUploadedFile.name);
+        }
+
+        try {
+            const res = await fetch(CONFIG.API_TRUONGKHOA, {
+                method: 'POST',
+                body: fd,
+                credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const data = await res.json();
+            if (data.success) {
+                successCount++;
+            } else {
+                failCount++;
+                console.error(`[Lỗi đơn ${currentId}]`, data.message);
+            }
+        } catch (e) {
+            failCount++;
+            console.error(`[Lỗi kết nối đơn ${currentId}]`, e);
+        }
+    }
+
+    // Trả lại trạng thái nút
+    btnApprove.disabled = false;
+    btnReject.disabled  = false;
+    btnApprove.innerHTML = originalApproveText;
+    btnReject.innerHTML = originalRejectText;
+
+    // Hiển thị kết quả
+    if (successCount > 0) {
+        bootstrap.Modal.getInstance(document.getElementById('modalOpinion'))?.hide();
+        
+        let msg = `Đã xử lý thành công ${successCount} đơn.`;
+        if (failCount > 0) msg += ` Có ${failCount} đơn bị lỗi.`;
+        
+        showToast(msg, {
+            title: action === 'approve' ? 'Thành công' : 'Đã từ chối',
+            type: failCount > 0 ? 'warning' : 'success'
+        });
+
+        // Reset UI
+        isBulkMode = false;
+        bulkSelectedIds = [];
+        document.getElementById('checkAllRows').checked = false;
+        document.getElementById('checkAllRows').indeterminate = false;
+        updateBulkBar();
+        
+        await loadList();
+    } else {
+        showToast('Không thể xử lý đơn nào. Vui lòng thử lại.', { type: 'error', title: 'Lỗi' });
+    }
+}
+
+/* ============================================================
+   ⭐ MODAL DUYỆT HỦY — Xử lý yêu cầu hủy
+   ============================================================ */
+function openCancelApprovalModal(data) {
+    document.getElementById('cancelApprovalDonId').value = data.id || '';
+    document.getElementById('cancelApprovalMaDon').textContent = data.maDon || '';
+    document.getElementById('cancelApprovalHoTen').textContent = data.hoTen || '';
+    document.getElementById('cancelApprovalChucVu').textContent =
+        data.chucVu ? `(${getChucVuLabel(data.chucVu)} · ${data.tenKhoa})` : '';
+    document.getElementById('cancelApprovalThoiGian').textContent =
+        `${formatDate(data.tuNgay)} → ${formatDate(data.denNgay)}`;
+    document.getElementById('cancelApprovalSoNgay').textContent = `${data.soNgay} ngày`;
+    document.getElementById('cancelApprovalLyDo').textContent = data.lyDo || '';
+    document.getElementById('cancelApprovalNote').value = '';
+
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelApproval'));
+    modal.show();
+}
+
+async function submitCancelApproval(action) {
+    const donId = document.getElementById('cancelApprovalDonId').value;
+    const note  = document.getElementById('cancelApprovalNote').value.trim();
+
+    if (!donId) return;
+
+    const confirmMsg = action === 'approve'
+        ? 'Bạn có chắc chắn muốn ĐỒNG Ý HỦY đơn này?\n\nĐơn sẽ chuyển sang trạng thái "Đã hủy" và không thể khôi phục.'
+        : 'Bạn có chắc chắn muốn TỪ CHỐI HỦY?\n\nĐơn sẽ quay về trạng thái "Đã duyệt" ban đầu.';
+
+    if (!confirm(confirmMsg)) return;
+
+    const btnApprove = document.getElementById('btnApproveCancel');
+    const btnReject  = document.getElementById('btnRejectCancel');
+    btnApprove.disabled = true;
+    btnReject.disabled  = true;
+
+    const fd = new FormData();
+    fd.set('don_id', donId);
+    fd.set('action_cancel_approval', action);
+    fd.set('ghi_chu', note);
+    fd.set('csrf_token', STATE.csrfToken);
+
+    try {
+        const res = await fetch(CONFIG.API_TRUONGKHOA, {
+            method: 'POST',
+            body: fd,
+            credentials: 'include',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('modalCancelApproval'))?.hide();
+            showToast(data.message || 'Xử lý thành công!', {
+                title: action === 'approve' ? 'Đã đồng ý hủy' : 'Đã từ chối hủy',
+                type: 'success'
+            });
+            await loadList();
+        } else {
+            showToast(data.message || 'Không thể xử lý!', { type: 'error', title: 'Lỗi' });
+        }
+    } catch (e) {
+        showToast('Lỗi kết nối: ' + e.message, { type: 'error', title: 'Lỗi' });
+    } finally {
+        btnApprove.disabled = false;
+        btnReject.disabled  = false;
+    }
+}
+
+function initSignatureSystem() {
+    initSignaturePad();
+    initSignatureMethod();
+    initSignatureUpload();
+}
+
+/* ============================================================
+   FILTER
+   ============================================================ */
+function initFilter() {
+    const form = document.getElementById('filterForm');
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        STATE.filters = {
+            keyword:       document.getElementById('filterKeyword').value.trim(),
+            status_filter: document.getElementById('filterStatus').value,
+            date_from:     document.getElementById('filterDateFrom').value,
+            date_to:       document.getElementById('filterDateTo').value,
+        };
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', STATE.tab);
+        url.searchParams.delete('page');
+        ['keyword', 'status_filter', 'date_from', 'date_to'].forEach(k => {
+            if (STATE.filters[k]) url.searchParams.set(k, STATE.filters[k]);
+            else                  url.searchParams.delete(k);
+        });
+
+        window.history.replaceState({}, '', url.toString());
+        loadList();
+    });
+
+    document.getElementById('btnResetFilter').addEventListener('click', resetFilter);
+}
+
+function resetFilter() {
+    STATE.filters = { keyword: '', status_filter: '', date_from: '', date_to: '' };
+    document.getElementById('filterKeyword').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterDateFrom').value = '';
+    document.getElementById('filterDateTo').value = '';
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', STATE.tab);
+    url.searchParams.delete('page');
+    ['keyword', 'status_filter', 'date_from', 'date_to'].forEach(k => url.searchParams.delete(k));
+
+    window.history.replaceState({}, '', url.toString());
+    loadList();
+}
+
+/* ============================================================
+   MODAL PROFILE
+   ============================================================ */
+function initProfileModal() {
+    const modal = document.getElementById('modalThongTinTaiKhoan');
+    if (!modal) return;
+    const tabs = modal.querySelectorAll('.profile-tab');
+    const panes = modal.querySelectorAll('.tab-pane');
+    const btnSave = document.getElementById('btnSaveProfile');
+    const btnLabel = document.getElementById('btnSaveLabel');
+    let currentTab = 'info';
+
+    function switchTab(target) {
+        currentTab = target;
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === target));
+        panes.forEach(p => p.classList.toggle('active', p.id === 'tab-' + target));
+        btnLabel.textContent = (target === 'password') ? 'Đặt lại mật khẩu' : 'Lưu thay đổi';
+
+        if (target === 'password') {
+            const label = document.getElementById('resetUsernameLabel');
+            if (label) {
+                const u = STATE.user || {};
+                label.textContent = u.ma_nv
+                    ? `"${u.ma_nv}"`
+                    : (u.username ? `"${u.username}"` : 'của bạn');
+            }
+        }
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+
+    modal.addEventListener('show.bs.modal', async (event) => {
+        const trigger = event.relatedTarget;
+        const tab = (trigger && trigger.dataset.openTab) ? trigger.dataset.openTab : 'info';
+        switchTab(tab);
+        fillUserInfo();
+
+        if (!STATE.csrfToken) await loadCsrfToken();
+        const a = document.getElementById('csrfTokenInfo');
+        const b = document.getElementById('csrfTokenPassword');
+        if (a) a.value = STATE.csrfToken;
+        if (b) b.value = STATE.csrfToken;
+
+        updatePwRules('');
+
+        document.querySelectorAll('.btn-toggle-pw-profile').forEach(btn => {
+            const input = document.getElementById(btn.dataset.target);
+            if (input) input.type = 'password';
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+
+    btnSave.addEventListener('click', async () => {
+        if (currentTab === 'password') await submitChangePassword();
+        else await submitUpdateInfo();
+    });
+}
+
+document.querySelectorAll('.btn-toggle-pw-profile').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const input = document.getElementById(this.dataset.target);
+        if (!input) return;
+        const icon = this.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+});
+
+document.getElementById('inp_hoten')?.addEventListener('blur', function () {
+    this.value = this.value.trim().replace(/\s+/g, ' ');
+    if (this.value) this.value = this.value.toLocaleUpperCase('vi-VN');
+});
+
+function updatePwRules(pw) {
+    const checks = {
+        length:  pw.length >= 6,
+        upper:   /[A-Z]/.test(pw),
+        lower:   /[a-z]/.test(pw),
+        number:  /[0-9]/.test(pw),
+        special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pw)
+    };
+    document.querySelectorAll('#pwRules .rule').forEach(rule => {
+        const key = rule.dataset.rule;
+        const icon = rule.querySelector('i');
+        if (checks[key]) {
+            rule.classList.add('ok');
+            icon.classList.replace('fa-circle', 'fa-check-circle');
+        } else {
+            rule.classList.remove('ok');
+            icon.classList.replace('fa-check-circle', 'fa-circle');
+        }
+    });
+    return Object.values(checks).every(Boolean);
+}
+
+document.getElementById('inp_newPw')?.addEventListener('input', function () {
+    updatePwRules(this.value);
+});
+
+async function submitUpdateInfo() {
+    const btn = document.getElementById('btnSaveProfile');
+    const fd = new FormData(document.getElementById('formUpdateInfo'));
+
+    let hotenVal = (fd.get('ho_ten') || '').toString().trim().replace(/\s+/g, ' ').toLocaleUpperCase('vi-VN');
+    document.getElementById('inp_hoten').value = hotenVal;
+
+    if (!hotenVal) {
+        showToast('Vui lòng nhập họ tên.', { type: 'error', title: 'Lỗi' });
+        return;
+    }
+
+    btn.disabled = true;
+    try {
+        const res = await fetch(CONFIG.API_UPDATE_INFO, {
+            method: 'POST', body: fd, credentials: 'include',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message || 'Cập nhật thành công!', { title: 'Thành công' });
+            bootstrap.Modal.getInstance(document.getElementById('modalThongTinTaiKhoan')).hide();
+            await checkAuth();
+            fillUserInfo();
+            renderSidebarMenu();
+        } else {
+            showToast(data.message || 'Cập nhật thất bại!', { type: 'error', title: 'Lỗi' });
+        }
+    } catch (e) {
+        showToast('Lỗi kết nối: ' + e.message, { type: 'error', title: 'Lỗi' });
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function submitChangePassword() {
+    const btn = document.getElementById('btnSaveProfile');
+    const fd = new FormData(document.getElementById('formChangePassword'));
+    const newPw = fd.get('new_password');
+    const confirmPw = fd.get('confirm_password');
+
+    if (!newPw || newPw.length < 6) {
+        showToast('Mật khẩu mới phải có ít nhất 6 ký tự.', { type: 'error', title: 'Lỗi' });
+        return;
+    }
+    if (newPw !== confirmPw) {
+        showToast('Mật khẩu xác nhận không khớp!', { type: 'error', title: 'Lỗi' });
+        return;
+    }
+
+    btn.disabled = true;
+    try {
+        const res = await fetch(CONFIG.API_RESET_PW, {
+            method: 'POST', body: fd, credentials: 'include',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message || 'Đổi mật khẩu thành công!', { title: 'Thành công' });
+            bootstrap.Modal.getInstance(document.getElementById('modalThongTinTaiKhoan')).hide();
+            document.getElementById('formChangePassword').reset();
+            updatePwRules('');
+        } else {
+            showToast(data.message || 'Đổi mật khẩu thất bại!', { type: 'error', title: 'Lỗi' });
+        }
+    } catch (e) {
+        showToast('Lỗi kết nối: ' + e.message, { type: 'error', title: 'Lỗi' });
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+function initLogout() {
+    const btn = document.getElementById('btnConfirmLogout');
+    btn?.addEventListener('click', async () => {
+        if (btn.dataset.processing === '1') return;
+        btn.dataset.processing = '1';
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang xử lý...';
+        try {
+            const fd = new FormData();
+            if (STATE.csrfToken) fd.append('csrf_token', STATE.csrfToken);
+            await fetch(`${CONFIG.API_LOGIN}?action=logout`, {
+                method: 'POST', body: fd, credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).catch(() => {});
+        } finally {
+            window.location.replace(CONFIG.LOGIN_PAGE);
+        }
+    });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(async function init() {
+    const ok = await checkAuth();
+    if (!ok) return;
+
+    await loadCsrfToken();
+    renderSidebarMenu();
+    fillUserInfo();
+    initNotifActions();
+    initFilter();
+    initProfileModal();
+    initLogout();
+    initSignatureSystem();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    STATE.tab = urlParams.get('tab') || 'pending';
+    if (!['pending', 'all'].includes(STATE.tab)) STATE.tab = 'pending';
+
+    document.getElementById('tabPending').classList.toggle('active', STATE.tab === 'pending');
+    document.getElementById('tabAll').classList.toggle('active', STATE.tab === 'all');
+
+    STATE.filters = {
+        keyword:       urlParams.get('keyword') || '',
+        status_filter: urlParams.get('status_filter') || '',
+        date_from:     urlParams.get('date_from') || '',
+        date_to:       urlParams.get('date_to') || '',
+    };
+
+    document.getElementById('btnApprove').addEventListener('click', () => submitOpinion('approve'));
+    document.getElementById('btnReject').addEventListener('click', () => submitOpinion('reject'));
+    document.getElementById('btnApproveCancel').addEventListener('click', () => submitCancelApproval('approve'));
+    document.getElementById('btnRejectCancel').addEventListener('click', () => submitCancelApproval('reject'));
+
+    await loadList();
+    loadNotifications();
+})();
+</script>
+
+</body>
+</html>

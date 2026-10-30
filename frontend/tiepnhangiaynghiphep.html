@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiếp Nhận Giấy Nghỉ Phép - Hệ Thống Quản Lý Giấy Nghỉ Phép</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+* { box-sizing: border-box; }
+body { font-family: 'Times New Roman', Times, Georgia, serif; background: #f4f8fd; color: #1e293b; margin: 0; -webkit-font-smoothing: antialiased; font-size: 14.5px; }
+.app-wrapper { display: flex; min-height: 100vh; }
+.app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+/* SIDEBAR */
+.app-sidebar { width: 320px; background: #fbfdff; border-right: 1px solid #e8f1fb; height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; overflow: hidden; z-index: 40; transform: translateX(-100%); transition: transform 0.32s cubic-bezier(.22,.9,.3,1); box-shadow: 0 0 44px rgba(20, 60, 110, 0.12); }
+.app-sidebar.open { transform: translateX(0); }
+.sidebar-header { display: flex; align-items: center; gap: 12px; padding: 20px 18px 18px; flex-shrink: 0; position: relative; overflow: hidden; background: linear-gradient(135deg, #6FB4F0 0%, #4A90E2 100%); }
+.sidebar-header::after { content: ""; position: absolute; right: -40px; top: -50px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255, 255, 255, 0.10); pointer-events: none; }
+.sidebar-header > * { position: relative; z-index: 1; }
+.sidebar-logo { width: 60px; height: 60px; border-radius: 50%; background: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 12px rgba(20, 60, 110, 0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; padding: 6px; }
+.sidebar-logo img { width: 100%; height: 100%; object-fit: contain; }
+.sidebar-brand-text { flex: 1; min-width: 0; text-align: center; padding-right: 8px; }
+.sidebar-title { font-size: 12.5px; font-weight: 700; letter-spacing: -0.2px; color: #fff; line-height: 1.3; word-break: break-word; }
+.sidebar-subtitle { font-size: 11.5px; color: rgba(255, 255, 255, 0.9); font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-menu { flex: 1; display: flex; flex-direction: column; gap: 3px; padding: 8px 14px 12px; margin: 0; list-style: none; overflow-y: auto; min-height: 0; scrollbar-width: none; }
+.sidebar-menu::-webkit-scrollbar { width: 0; }
+.menu-category { padding: 18px 10px 8px; font-size: 11.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #a8c0d6; list-style: none; }
+.menu-category:first-child { padding-top: 12px; }
+.menu-item { list-style: none; }
+.menu-item a { display: flex; align-items: center; gap: 13px; padding: 12px 14px; border-radius: 12px; color: #64748b; font-weight: 600; font-size: 15px; text-decoration: none; transition: all 0.22s ease; position: relative; line-height: 1.3; }
+.menu-item a i { font-size: 16.5px; width: 20px; text-align: center; flex-shrink: 0; color: #94aecb; transition: color 0.22s ease; }
+.menu-item a > span:not(.menu-badge) { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu-item a:hover { background: #f0f7ff; color: #4A90E2; }
+.menu-item a:hover i { color: #5FA5EC; }
+.menu-item.active a { background: linear-gradient(135deg, #eaf4ff 0%, #f5faff 100%); color: #357ABD; box-shadow: inset 0 0 0 1px #d8e9fc; }
+.menu-item.active a i { color: #4A90E2; }
+.menu-item.active a::before { content: ""; position: absolute; left: -14px; top: 50%; transform: translateY(-50%); width: 4px; height: 24px; border-radius: 0 4px 4px 0; background: #5FA5EC; }
+.menu-item .menu-badge { margin-left: auto; background: #fff5e6; color: #d18f2b; font-size: 12.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 22px; line-height: 1; white-space: nowrap; }
+.sidebar-footer { flex-shrink: 0; padding: 14px 16px 18px; border-top: 1px solid #e8f1fb; background: #fbfdff; }
+.user-compact-info { background: linear-gradient(140deg, #f2f8ff 0%, #fbfdff 100%); border: 1px solid #dcecfb; border-radius: 14px; padding: 12px 14px; }
+.user-compact-info .user-name { font-size: 14.5px; font-weight: 700; color: #1e3a5f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; line-height: 1.3; }
+.user-compact-info .user-role { font-size: 12.5px; color: #8aa8c7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+.sb-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.42); z-index: 35; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(2px); }
+.sb-overlay.show { opacity: 1; pointer-events: auto; }
+
+/* NAVBAR */
+.app-navbar { height: 72px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid #e8f1fb; display: flex; align-items: center; gap: 16px; padding: 0 30px; position: sticky; top: 0; z-index: 20; flex-shrink: 0; }
+.btn-hamburger { width: 42px; height: 42px; border-radius: 12px; border: 1px solid #e8f1fb; background: #ffffff; color: #4A90E2; font-size: 17px; display: grid; place-items: center; cursor: pointer; flex-shrink: 0; }
+.btn-hamburger:hover { background: #eaf4ff; border-color: #c9e0f9; }
+.notif-bell-btn { width: 42px; height: 42px; border-radius: 12px; border: 1px solid #c9e0f9; background: linear-gradient(135deg, #eaf4ff 0%, #f5faff 100%); color: #4A90E2; font-size: 16px; display: grid; place-items: center; cursor: pointer; position: relative; padding: 0; }
+.notif-bell-btn:hover { background: linear-gradient(135deg, #dcefff 0%, #eaf4ff 100%); border-color: #5FA5EC; color: #357ABD; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74, 144, 226, 0.18); }
+.notif-bell-btn .notif-badge-count { position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px; padding: 0 6px; background: #ef4444; color: #fff; font-size: 0.75rem; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid #fff; line-height: 1; }
+.notif-dropdown-menu { width: 390px; max-width: calc(100vw - 28px); padding: 0; border: none; border-radius: 14px; overflow: hidden; box-shadow: 0 12px 40px rgba(15, 23, 42, 0.15); margin-top: 8px; }
+.notif-header { padding: 12px 16px; border-bottom: 1px solid #eef2f7; background: #f8fbff; display: flex; align-items: center; justify-content: space-between; }
+.notif-header .title { font-weight: 700; color: #0f172a; font-size: 1rem; }
+.notif-header .title i { color: #4A90E2; }
+.notif-header .mark-all-btn { background: transparent; border: none; color: #4A90E2; font-size: 0.85rem; font-weight: 600; cursor: pointer; padding: 0; }
+.notif-scroll-container { max-height: 380px; overflow-y: auto; }
+.notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #f1f5f9; text-decoration: none; color: inherit; background: #f8fbff; }
+.notif-item:hover { background: #eef6ff; }
+.notif-item .notif-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4px; }
+.notif-item .notif-body { flex: 1; min-width: 0; }
+.notif-item .notif-title { font-weight: 700; font-size: 0.95rem; }
+.notif-item .notif-content { color: #64748b; font-size: 0.88rem; margin-top: 4px; word-break: break-word; }
+.notif-item .notif-time { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; }
+.notif-empty-state { padding: 32px 20px; text-align: center; color: #94a3b8; }
+.user-nav-btn { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-radius: 999px; border: 1px solid #e8f1fb; background: #ffffff; cursor: pointer; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04); font-family: inherit; }
+.user-nav-btn:hover { background: #f0f7ff; border-color: #c9e0f9; }
+.user-nav-btn .text-block { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
+.user-nav-btn .text-block .name { font-size: 14px; font-weight: 700; color: #0f172a; white-space: nowrap; }
+.user-nav-btn .text-block .role { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+.user-nav-btn .chevron { color: #94a3b8; font-size: 11px; margin-left: 2px; }
+.dropdown-header-user { padding: 14px 16px 12px; border-bottom: 1px solid #eef2f7; background: #f8fbff; border-radius: 12px 12px 0 0; }
+.dropdown-header-user .name { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.dropdown-header-user .role-badge-sm { display: inline-block; padding: 2px 10px; background: #eaf3fd; color: #1d6fc7; font-size: 12px; font-weight: 600; border-radius: 20px; }
+.dropdown-header-user .dept { margin-top: 8px; font-size: 13.5px; color: #64748b; }
+.dropdown-header-user .dept i { color: #94a3b8; margin-right: 4px; }
+
+/* CONTENT */
+.content-body { flex: 1; padding: 28px 30px 44px; overflow-x: hidden; }
+.tabs-wrapper { display: flex; gap: 6px; padding: 6px; background: #ffffff; border: 1px solid #eef2f7; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); margin-bottom: 20px; flex-wrap: wrap; }
+.tab-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-size: 15px; font-weight: 600; color: #64748b; text-decoration: none; transition: all 0.2s ease; line-height: 1; cursor: pointer; }
+.tab-link:hover { background: #f0f7ff; color: #4A90E2; }
+.tab-link.active { background: linear-gradient(135deg, #5FA5EC, #4A90E2); color: #fff; box-shadow: 0 4px 12px rgba(74, 144, 226, 0.28); }
+.scope-badge { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: #f8fafc; border: 1px solid #eef2f7; border-radius: 10px; font-size: 14px; color: #475569; }
+.scope-badge strong { color: #0f172a; }
+.filter-card { background: #ffffff; border: 1px solid #eef2f7; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); margin-bottom: 20px; }
+.filter-title { font-size: 14px; font-weight: 700; color: #4A90E2; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed #eef2f7; }
+.filter-form { display: grid; grid-template-columns: 2fr auto; gap: 12px; align-items: end; }
+.form-group-f { display: flex; flex-direction: column; gap: 6px; }
+.form-group-f label { font-size: 13px; font-weight: 600; color: #475569; }
+.form-control-f { padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; background: #f8fafc; font-family: inherit; font-size: 14.5px; color: #1e293b; outline: none; transition: all 0.2s; width: 100%; }
+.form-control-f:focus { border-color: #4A90E2; background: #fff; box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.10); }
+.filter-actions { display: flex; gap: 8px; }
+.btn-f { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 10px; font-family: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; text-decoration: none; border: 1px solid transparent; line-height: 1; }
+.btn-f-primary { background: linear-gradient(135deg, #5FA5EC, #4A90E2); color: #fff; box-shadow: 0 4px 12px rgba(74, 144, 226, 0.28); }
+.btn-f-primary:hover { transform: translateY(-1px); color: #fff; }
+.btn-f-outline { background: #fff; color: #64748b; border-color: #e2e8f0; }
+.btn-f-outline:hover { background: #f8fafc; color: #4A90E2; border-color: #c9e0f9; }
+.card-modern { border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); overflow: hidden; background: #fff; }
+.card-modern .card-header { padding: 18px 24px; background: #ffffff; border-bottom: 1px solid #eef2f7; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.card-modern .card-header h6 { font-size: 16px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 10px; margin: 0; }
+.card-modern .card-header h6 i { color: #4A90E2; }
+.count-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 22px; padding: 0 9px; background: #eaf3fd; color: #1d6fc7; font-size: 12.5px; font-weight: 700; border-radius: 20px; line-height: 1; margin-left: 4px; }
+
+/* ⭐ BULK ACTION BAR */
+.bulk-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: #eaf4ff;
+    border-bottom: 1px solid #d8e9fc;
+    animation: slideDown 0.3s ease;
+}
+.bulk-action-bar.d-none { display: none !important; }
+.bulk-action-info {
+    font-size: 14.5px;
+    color: #357ABD;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.bulk-action-info i { color: #4A90E2; }
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.table-responsive { overflow-x: auto; }
+.table-custom { margin-bottom: 0; width: 100%; min-width: 1500px; border-collapse: collapse; }
+.table-custom thead th { border-bottom: 1px solid #eef2f7; font-weight: 700; letter-spacing: 0.6px; font-size: 12.5px; color: #94a3b8; text-transform: uppercase; padding: 16px 18px; white-space: nowrap; background: #fafbfd; text-align: left; vertical-align: middle; }
+.table-custom tbody td { padding: 18px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; font-size: 15px; color: #1e293b; line-height: 1.5; }
+.table-custom tbody tr:hover { background: #f8fafc; }
+.table-custom tbody tr.row-selected { background: #f0f7ff; }
+.table-custom thead th:first-child, .table-custom tbody td:first-child { padding-left: 26px; }
+.table-custom thead th:last-child, .table-custom tbody td:last-child { padding-right: 26px; text-align: right; min-width: 240px; }
+.td-stt { font-weight: 600; color: #94a3b8; font-size: 14px; text-align: center; }
+.emp-name { font-weight: 700; color: #0f172a; font-size: 15px; line-height: 1.35; margin-bottom: 4px; white-space: nowrap; }
+.emp-role { font-size: 13.5px; color: #94a3b8; white-space: nowrap; }
+.khoa-cell { display: block; color: #64748b; font-size: 14.5px; line-height: 1.45; word-break: break-word; overflow-wrap: break-word; max-width: 160px; }
+.code-badge { display: inline-block; background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; font-family: 'SF Mono', Consolas, monospace; font-weight: 600; font-size: 13px; padding: 5px 10px; border-radius: 7px; white-space: nowrap; }
+.time-cell .time-main { font-weight: 600; color: #0f172a; font-size: 14.5px; margin-bottom: 3px; white-space: nowrap; }
+.time-cell .time-main i { color: #4A90E2; margin-right: 4px; }
+.time-cell .time-sub { font-size: 13.5px; color: #94a3b8; }
+.day-badge { display: inline-block; background: #eaf3fd; color: #1d6fc7; border: 1px solid #c9e0f9; font-weight: 700; font-size: 15px; padding: 5px 14px; border-radius: 8px; min-width: 52px; text-align: center; }
+.leave-remain-badge { display: inline-block; background: #ecfdf5; color: #047857; border: 1px solid #bbf7d0; font-weight: 700; font-size: 15px; padding: 5px 14px; border-radius: 8px; min-width: 52px; text-align: center; }
+.status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+.sb-info { background: #eff6ff; color: #1d4ed8; }
+.sb-success { background: #ecfdf5; color: #047857; }
+.receipt-info { display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; }
+.receipt-info .ri-date { color: #0f172a; font-weight: 700; font-size: 14.5px; }
+.receipt-info .ri-meta { color: #94a3b8; font-size: 13px; }
+.receipt-info .ri-meta i { color: #4A90E2; margin-right: 3px; } /* Khôi phục CSS cho icon người dùng */
+.waiting-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 8px; background: #fff7ed; color: #c2410c; font-size: 13px; font-weight: 700; border: 1px solid #fed7aa; }
+
+/* ⭐ CSS NÚT THAO TÁC */
+.action-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 8px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; border: 1px solid transparent; line-height: 1; white-space: nowrap; }
+.action-btn-view { background: #fff; color: #64748b; border-color: #e2e8f0; }
+.action-btn-view:hover { background: #eaf3fd; color: #1d6fc7; border-color: #c9e0f9; }
+.action-btn-print { background: #fff; color: #4A90E2; border-color: #c9e0f9; }
+.action-btn-print:hover { background: #eaf3fd; color: #357ABD; border-color: #a9d2f5; }
+.action-btn-receive { background: linear-gradient(135deg, #34d399, #22c55e); color: #fff; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28); }
+.action-btn-receive:hover { transform: translateY(-1px); color: #fff; }
+
+.empty-state { padding: 60px 20px; text-align: center; color: #94a3b8; }
+.empty-state .empty-icon { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #eef2ff 0%, #dbeafe 100%); display: inline-flex; align-items: center; justify-content: center; font-size: 38px; color: #3b82f6; margin-bottom: 20px; }
+.empty-state .empty-title { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+.empty-state .empty-sub { font-size: 14.5px; color: #64748b; max-width: 400px; margin: 0 auto; }
+.pagination-wrap { padding: 18px 26px 22px; border-top: 1px solid #eef2f7; background: #fafbfd; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+.pagination-info { font-size: 14px; color: #64748b; order: 2; margin-left: auto; }
+.pagination-info strong { color: #1e293b; }
+.pagination-bar { display: inline-flex; align-items: center; gap: 6px; padding: 6px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px; order: 1; }
+.page-btn { min-width: 38px; height: 38px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; border-radius: 9px; background: #ffffff; color: #374151; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.18s ease; cursor: pointer; line-height: 1; }
+.page-btn:hover:not(.active):not(.disabled):not(.ellipsis) { background: #f0f9f4; border-color: #bfe0cd; color: #4A7C59; }
+.page-btn.active { background: #4A7C59; border-color: #4A7C59; color: #ffffff; box-shadow: 0 3px 8px rgba(74, 124, 89, 0.28); }
+.page-btn.disabled { background: #f9fafb; color: #cbd5e1; border-color: #f1f5f9; pointer-events: none; }
+.page-btn.ellipsis { border: none; background: transparent; min-width: 24px; padding: 0 4px; color: #94a3b8; pointer-events: none; }
+
+/* MODAL PROFILE */
+.modal-profile .modal-content { border: none; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18); }
+.modal-profile .modal-header { background: #ffffff; border-bottom: 1px solid #eef2f7; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.modal-profile .modal-title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; }
+.modal-profile .title-icon { width: 32px; height: 32px; border-radius: 50%; background: #eaf4ff; display: grid; place-items: center; color: #4A90E2; font-size: 14px; flex-shrink: 0; }
+.modal-profile .btn-close-custom { width: 32px; height: 32px; border-radius: 50%; border: none; background: #f1f5f9; color: #64748b; display: grid; place-items: center; cursor: pointer; font-size: 12px; }
+.modal-profile .profile-tabs { display: flex; gap: 4px; padding: 0 18px; border-bottom: 1px solid #eef2f7; background: #ffffff; }
+.modal-profile .profile-tab { position: relative; padding: 10px 14px; border: none; background: transparent; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: inherit; }
+.modal-profile .profile-tab i { font-size: 13px; }
+.modal-profile .profile-tab.active { color: #4A90E2; }
+.modal-profile .profile-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: #4A90E2; border-radius: 3px 3px 0 0; }
+.modal-profile .modal-body { padding: 0; background: #ffffff; max-height: 60vh; overflow-y: auto; }
+.modal-profile .tab-pane { display: none; padding: 18px 20px 20px; }
+.modal-profile .tab-pane.active { display: block; }
+.form-row-p { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-bottom: 12px; }
+.form-row-p.full { grid-template-columns: 1fr; }
+.form-group-p { display: flex; flex-direction: column; gap: 5px; }
+.form-group-p label { font-size: 13.5px; font-weight: 600; color: #334155; }
+.form-group-p label .req { color: #ef4444; margin-left: 2px; }
+.form-group-p input, .form-group-p select { width: 100%; padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-family: inherit; font-size: 14px; color: #1e293b; outline: none; }
+.form-group-p input:focus, .form-group-p select:focus { border-color: #4A90E2; box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15); }
+.form-group-p input:disabled { background: #f8fafc; color: #64748b; cursor: not-allowed; }
+#inp_hoten { text-transform: uppercase; letter-spacing: 0.2px; }
+.form-group-p input.is-invalid, .form-group-p input.is-invalid:focus { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12); }
+.form-group-p .field-error { display: none; font-size: 12.5px; color: #dc2626; margin-top: 2px; align-items: center; gap: 4px; line-height: 1.3; }
+.form-group-p .field-error.show { display: flex; }
+.form-group-p .field-error i { font-size: 10px; flex-shrink: 0; }
+.reset-info-banner { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; font-size: 13.5px; margin-bottom: 12px; background: #eaf4ff; border: 1px solid #c9e0f9; color: #357ABD; }
+.pw-rules { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-top: 6px; font-size: 12.5px; }
+.pw-rules .rule { display: flex; align-items: center; gap: 6px; padding: 2px 0; color: #94a3b8; }
+.pw-rules .rule i { width: 13px; text-align: center; font-size: 10px; color: #cbd5e1; }
+.pw-rules .rule.ok { color: #059669; }
+.pw-rules .rule.ok i { color: #22c55e; }
+.modal-profile .modal-footer { padding: 12px 20px; background: #ffffff; border-top: 1px solid #eef2f7; display: flex; justify-content: flex-end; gap: 10px; }
+.modal-profile .btn-cancel-p { padding: 8px 18px; border: none; background: transparent; color: #64748b; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; font-family: inherit; }
+.modal-profile .btn-cancel-p:hover { background: #f1f5f9; color: #334155; }
+.modal-profile .btn-save-p { padding: 8px 20px; border: none; background: linear-gradient(135deg, #5FA5EC 0%, #4A90E2 100%); color: #ffffff; font-size: 14px; font-weight: 700; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; box-shadow: 0 4px 12px rgba(74, 144, 226, 0.28); }
+.modal-profile .btn-save-p:hover { background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); transform: translateY(-1px); }
+.modal-profile .btn-save-p:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.profile-alert { padding: 8px 12px; border-radius: 8px; font-size: 13.5px; margin-bottom: 12px; display: none; }
+.profile-alert.show { display: block; }
+.profile-alert.success { background: #e8f9ee; color: #16a34a; border: 1px solid #bbf7d0; }
+.profile-alert.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+/* MODAL RECEIVE */
+.modal-receive .modal-content { border: none; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.20); max-height: calc(100vh - 40px); display: flex; flex-direction: column; }
+.modal-receive .modal-dialog { max-width: 640px; margin: 20px auto; }
+.modal-receive .modal-header { padding: 18px 24px; background: linear-gradient(135deg, #34d399 0%, #22c55e 100%); border-bottom: none; color: #fff; flex: 0 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.modal-receive .modal-header-text { flex: 1; min-width: 0; }
+.modal-receive .modal-title { font-size: 17px; font-weight: 700; color: #fff; margin: 0 0 4px 0; display: flex; align-items: center; gap: 10px; line-height: 1.3; }
+.modal-receive .modal-subtitle { font-size: 13.5px; color: rgba(255, 255, 255, 0.92); display: flex; align-items: center; gap: 6px; font-weight: 500; }
+.modal-receive .modal-subtitle strong { font-family: 'SF Mono', Consolas, monospace; color: #fff; font-weight: 700; font-size: 14px; background: rgba(255, 255, 255, 0.18); padding: 2px 8px; border-radius: 6px; }
+.modal-receive .btn-close { filter: brightness(0) invert(1); opacity: 0.85; flex-shrink: 0; margin-top: 4px; }
+.modal-receive .modal-body { padding: 20px 24px 22px; background: #f8fafc; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.receive-section { background: #ffffff; border: 1px solid #eef2f7; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02); }
+.receive-section:last-child { margin-bottom: 0; }
+.receive-section-title { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #334155; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px dashed #eef2f7; }
+.receive-section-title .section-icon { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #eaf4ff 0%, #dbeafe 100%); color: #1d6fc7; display: grid; place-items: center; font-size: 13px; flex-shrink: 0; }
+.receive-emp-card { display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; }
+.receive-emp-name { font-size: 18px; font-weight: 700; color: #0f172a; line-height: 1.35; margin-bottom: 2px; word-break: break-word; }
+.receive-emp-meta { font-size: 14px; color: #64748b; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; line-height: 1.4; }
+.receive-emp-meta .dot { color: #cbd5e1; font-size: 10px; }
+.receive-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-bottom: 14px; }
+.receive-info-item { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.receive-info-item.full { grid-column: 1 / -1; padding-top: 12px; border-top: 1px dashed #eef2f7; margin-top: 4px; }
+.receive-info-item label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: #94a3b8; margin: 0; }
+.receive-info-item .value { font-size: 15px; font-weight: 700; color: #0f172a; line-height: 1.4; word-break: break-word; display: flex; align-items: center; gap: 6px; }
+.receive-info-item .value i { color: #4A90E2; font-size: 13px; }
+.receive-info-item .value.date-range { color: #1d4ed8; }
+.receive-info-item .value.success { color: #047857; }
+.receive-info-item .value small { font-size: 13px; font-weight: 500; color: #64748b; }
+.receive-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.receive-field:last-child { margin-bottom: 0; }
+.receive-field label { font-size: 13.5px; font-weight: 700; color: #334155; display: flex; align-items: center; gap: 6px; margin: 0; }
+.receive-field label i { color: #22c55e; font-size: 13px; }
+.receive-field label .req { color: #ef4444; margin-left: 2px; }
+.receive-field input[type="date"], .receive-field input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-family: inherit; font-size: 15px; color: #1e293b; outline: none; transition: all 0.2s; background: #fff; }
+.receive-field input[type="date"]:focus, .receive-field input[type="text"]:focus { border-color: #22c55e; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12); }
+.receive-field input[readonly] { background: #f8fafc; color: #64748b; cursor: not-allowed; }
+.receive-field .hint { font-size: 12.5px; color: #64748b; display: flex; align-items: flex-start; gap: 6px; line-height: 1.45; margin-top: 4px; padding: 8px 10px; background: #f0f9ff; border-left: 3px solid #38bdf8; border-radius: 6px; }
+.receive-field .hint i { color: #0ea5e9; margin-top: 2px; flex-shrink: 0; font-size: 12px; }
+.receive-field .hint strong { color: #0f172a; }
+.modal-receive .modal-footer { padding: 16px 24px; background: #ffffff; border-top: 1px solid #eef2f7; display: flex; justify-content: flex-end; gap: 12px; flex: 0 0 auto; }
+.btn-cancel-m { padding: 10px 22px; border-radius: 10px; background: #fff; color: #64748b; border: 1.5px solid #e2e8f0; font-size: 14.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.btn-cancel-m:hover { background: #f8fafc; color: #334155; border-color: #cbd5e1; }
+.btn-receive-m { padding: 10px 24px; border-radius: 10px; background: linear-gradient(135deg, #34d399, #22c55e); color: #fff; border: none; font-size: 14.5px; font-weight: 700; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28); }
+.btn-receive-m:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(34, 197, 94, 0.38); }
+.btn-receive-m:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* TOAST */
+.toast-container-custom { position: fixed; right: 20px; bottom: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast-custom { display: flex; align-items: flex-start; gap: 12px; min-width: 300px; max-width: 420px; padding: 14px 16px; background: linear-gradient(135deg, #5FA5EC 0%, #4A90E2 100%); color: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(74, 144, 226, 0.35); font-size: 14.5px; pointer-events: auto; animation: toastSlideIn 0.35s cubic-bezier(.22,.9,.3,1); position: relative; overflow: hidden; }
+.toast-custom.toast-error { background: linear-gradient(135deg, #f87171 0%, #ef4444 100%); }
+.toast-custom.toast-hide { animation: toastSlideOut 0.3s ease forwards; }
+.toast-custom .toast-icon { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.22); display: grid; place-items: center; font-size: 15px; flex-shrink: 0; }
+.toast-custom .toast-body { flex: 1; min-width: 0; }
+.toast-custom .toast-title { font-weight: 700; margin-bottom: 3px; }
+.toast-custom .toast-message { font-size: 13.5px; opacity: 0.92; word-break: break-word; }
+.toast-custom .toast-close { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(255,255,255,0.18); color: #fff; cursor: pointer; display: grid; place-items: center; font-size: 10px; }
+@keyframes toastSlideIn { from { opacity: 0; transform: translateX(120%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastSlideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(120%); } }
+
+/* RESPONSIVE */
+@media (max-width: 1199.98px) { .filter-form { grid-template-columns: 1fr; } .filter-actions { justify-content: flex-end; } }
+@media (max-width: 991.98px) { .app-navbar { padding: 0 18px; } .content-body { padding: 20px 18px 40px; } }
+@media (max-width: 767.98px) { .form-row-p { grid-template-columns: 1fr; } .tabs-wrapper { width: 100%; } .tab-link { flex: 1; justify-content: center; font-size: 14px; padding: 10px 12px; } .scope-badge { margin-left: 0; width: 100%; justify-content: center; } .user-nav-btn .text-block { display: none; } .notif-dropdown-menu { width: calc(100vw - 28px); } .receive-info-grid { grid-template-columns: 1fr; } }
+@media (max-width: 380px) { .app-sidebar { width: 90vw; } }
+</style>
+</head>
+<body>
+
+<div class="toast-container-custom" id="toastContainer"></div>
+
+<div class="app-wrapper">
+
+    <aside class="app-sidebar" id="appSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <img src="uploads/img/logo-tmmc.png" alt="Logo TMMC">
+            </div>
+            <div class="sidebar-brand-text">
+                <div class="sidebar-title">BỆNH VIỆN TÂM TRÍ ĐỒNG THÁP</div>
+                <div class="sidebar-subtitle">Tập đoàn Y khoa TMMC</div>
+            </div>
+        </div>
+        <ul class="sidebar-menu" id="sidebarMenu"></ul>
+        <div class="sidebar-footer">
+            <div class="user-compact-info">
+                <div class="user-name" id="sbUserName">Đang tải...</div>
+                <div class="user-role" id="sbUserRole">—</div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="sb-overlay" id="sbOverlay"></div>
+
+    <div class="app-main">
+
+        <header class="app-navbar">
+            <button class="btn-hamburger" id="sidebarToggle" type="button" title="Mở menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div style="flex: 1;"></div>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown">
+                    <button class="notif-bell-btn" type="button" id="btnNotificationBell"
+                            data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                        <i class="fas fa-bell"></i>
+                        <span class="notif-badge-count d-none" id="notifBadgeCount">0</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end notif-dropdown-menu">
+                        <div class="notif-header">
+                            <span class="title"><i class="fas fa-bell me-1"></i>Thông báo</span>
+                            <button type="button" class="mark-all-btn d-none" id="notifMarkAllBtn">
+                                <i class="fas fa-check-double me-1"></i>Đọc tất cả
+                            </button>
+                        </div>
+                        <div class="notif-scroll-container" id="notifScrollContainer">
+                            <div class="notif-empty-state">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <div class="mt-2">Đang tải...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="user-nav-btn" type="button" data-bs-toggle="dropdown">
+                        <div class="text-block">
+                            <span class="name" id="navUserName">...</span>
+                            <span class="role" id="navUserRole">...</span>
+                        </div>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-0"
+                        style="min-width: 260px; border-radius: 12px; overflow: hidden;">
+                        <li class="dropdown-header-user">
+                            <div class="name" id="ddUserName">...</div>
+                            <div class="role-badge-sm" id="ddUserRole">...</div>
+                            <div class="dept">
+                                <i class="fas fa-building"></i>
+                                <span id="ddUserDept">Bộ phận chưa cập nhật</span>
+                            </div>
+                        </li>
+                        <li class="py-1">
+                            <a class="dropdown-item py-2 px-3 fw-medium text-dark" href="#"
+                               data-bs-toggle="modal" data-bs-target="#modalThongTinTaiKhoan" data-open-tab="info">
+                                <i class="fas fa-user-circle text-primary me-2" style="width:18px;"></i>Thông tin cá nhân
+                            </a>
+                        </li>
+                        <li class="pb-1">
+                            <a class="dropdown-item py-2 px-3 fw-medium text-dark" href="#"
+                               data-bs-toggle="modal" data-bs-target="#modalThongTinTaiKhoan" data-open-tab="password">
+                                <i class="fas fa-unlock-keyhole text-primary me-2" style="width:18px;"></i>Đổi mật khẩu
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-0"></li>
+                        <li class="py-1">
+                            <a class="dropdown-item py-2 px-3 fw-medium text-danger" href="#"
+                               data-bs-toggle="modal" data-bs-target="#modalXacNhanDangXuat">
+                                <i class="fas fa-arrow-right-from-bracket me-2" style="width:18px;"></i>Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-body">
+
+            <div class="tabs-wrapper">
+                <a class="tab-link" id="tabPending" data-tab="pending">
+                    <i class="fas fa-inbox"></i>
+                    <span>Chờ Tiếp Nhận</span>
+                </a>
+                <a class="tab-link" id="tabReceived" data-tab="received">
+                    <i class="fas fa-folder-check"></i>
+                    <span>Đã Tiếp Nhận</span>
+                </a>
+                <div class="scope-badge">
+                    <i class="fas fa-building"></i>
+                    <span>Phòng:</span>
+                    <strong>Nhân sự</strong>
+                </div>
+            </div>
+
+            <div class="filter-card">
+                <div class="filter-title">
+                    <i class="fas fa-filter"></i>
+                    <span>Bộ lọc tìm kiếm</span>
+                </div>
+                <form id="filterForm" class="filter-form">
+                    <div class="form-group-f">
+                        <label>Tìm kiếm</label>
+                        <input type="text" id="filterKeyword" class="form-control-f"
+                               placeholder="Tìm theo tên nhân viên, mã nhân viên, mã đơn...">
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-f btn-f-primary">
+                            <i class="fas fa-search"></i> Lọc
+                        </button>
+                        <button type="button" class="btn-f btn-f-outline" id="btnResetFilter" title="Xóa lọc">
+                            <i class="fas fa-rotate-left"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card card-modern">
+                <div class="card-header">
+                    <h6>
+                        <i class="fas fa-folder-open"></i>
+                        <span id="tableTitle">Danh Sách Chờ Tiếp Nhận</span>
+                        <span class="count-pill" id="totalPill">0</span>
+                    </h6>
+                </div>
+
+                <!-- ⭐ BULK ACTION BAR -->
+                <div class="bulk-action-bar d-none" id="bulkActionBar">
+                    <div class="bulk-action-info">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Đã chọn <strong id="selectedCount">0</strong> đơn</span>
+                    </div>
+                    <button type="button" class="btn-f btn-f-primary" id="btnBulkReceive">
+                        <i class="fas fa-folder-check"></i> Tiếp nhận đã chọn
+                    </button>
+                </div>
+
+                <div id="tableContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                        <div class="empty-title">Đang tải dữ liệu...</div>
+                    </div>
+                </div>
+
+                <div class="pagination-wrap d-none" id="paginationWrap">
+                    <div class="pagination-bar" id="paginationBar"></div>
+                    <div class="pagination-info" id="paginationInfo"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- MODAL RECEIVE -->
+<div class="modal fade modal-receive" id="modalReceive" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="formReceive" autocomplete="off" novalidate style="display:flex;flex-direction:column;height:100%;min-height:0;">
+                <input type="hidden" name="don_id" id="receiveDonId" value="">
+                <input type="hidden" name="csrf_token" id="receiveCsrf" value="">
+
+                <div class="modal-header">
+                    <div class="modal-header-text">
+                        <h5 class="modal-title">
+                            <i class="fas fa-folder-check"></i>
+                            Tiếp nhận giấy nghỉ phép
+                        </h5>
+                        <div class="modal-subtitle">
+                            <span>Mã đơn:</span>
+                            <strong id="receiveMaDon">—</strong>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="receive-section">
+                        <div class="receive-section-title">
+                            <span class="section-icon"><i class="fas fa-user"></i></span>
+                            Thông tin nhân viên
+                        </div>
+                        <div class="receive-emp-card">
+                            <div class="receive-emp-name" id="receiveHoTen">—</div>
+                            <div class="receive-emp-meta">
+                                <span id="receiveChucVu">—</span>
+                                <span class="dot">•</span>
+                                <span id="receiveTenKhoa">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="receive-section">
+                        <div class="receive-section-title">
+                            <span class="section-icon"><i class="fas fa-calendar-alt"></i></span>
+                            Thời gian nghỉ
+                        </div>
+                        <div class="receive-info-grid">
+                            <div class="receive-info-item">
+                                <label>Từ ngày</label>
+                                <div class="value date-range" id="receiveTuNgay">—</div>
+                            </div>
+                            <div class="receive-info-item">
+                                <label>Đến ngày</label>
+                                <div class="value date-range" id="receiveDenNgay">—</div>
+                            </div>
+                            <div class="receive-info-item">
+                                <label>Ca nghỉ</label>
+                                <div class="value" id="receiveBuoi">—</div>
+                            </div>
+                            <div class="receive-info-item">
+                                <label>Tổng số ngày</label>
+                                <div class="value" id="receiveSoNgay">—</div>
+                            </div>
+                        </div>
+                        <div class="receive-info-item full">
+                            <label>Ngày gửi đơn</label>
+                            <div class="value" id="receiveNgayGui">—</div>
+                        </div>
+                        <div class="receive-info-item full" style="margin-top:10px;">
+                            <label>Ngày Lãnh đạo duyệt</label>
+                            <div class="value success" id="receiveNgayDuyet">—</div>
+                        </div>
+                    </div>
+
+                    <div class="receive-section">
+                        <div class="receive-section-title">
+                            <span class="section-icon" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #047857;">
+                                <i class="fas fa-pen-to-square"></i>
+                            </span>
+                            Thông tin tiếp nhận
+                        </div>
+
+                        <div class="receive-field">
+                            <label>
+                                <i class="far fa-calendar-check"></i>
+                                Ngày nộp giấy nghỉ phép (P. Nhân sự ghi)
+                                <span class="req">*</span>
+                            </label>
+                            <input type="date" name="ngay_nop_nhan_su" id="receiveNgayNop" required>
+                            <div class="hint">
+                                <i class="fas fa-circle-info"></i>
+                                <span>
+                                    Mặc định lấy <strong>ngày gửi đơn (<span id="receiveNgayGuiDefault">—</span>)</strong>.
+                                    Nhân sự có thể chọn lại theo ngày nộp thực tế của nhân viên.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="receive-field">
+                            <label>
+                                <i class="fas fa-user-tie"></i>
+                                Nhân sự tiếp nhận
+                            </label>
+                            <input type="text" id="receiveCanBo" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel-m" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Đóng
+                    </button>
+                    <button type="submit" class="btn-receive-m" id="btnSubmitReceive">
+                        <i class="fas fa-folder-check"></i>
+                        TIẾP NHẬN GIẤY
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PROFILE -->
+<div class="modal fade modal-profile" id="modalThongTinTaiKhoan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <span class="title-icon"><i class="fas fa-user-circle"></i></span>
+                    <span>Thông tin cá nhân</span>
+                </h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="profile-tabs">
+                <button type="button" class="profile-tab active" data-tab="info">
+                    <i class="fas fa-id-card"></i> Thông tin cá nhân
+                </button>
+                <button type="button" class="profile-tab" data-tab="password">
+                    <i class="fas fa-unlock-keyhole"></i> Đổi mật khẩu
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="tab-pane active" id="tab-info">
+                    <div class="profile-alert" id="alertInfo"></div>
+                    <form id="formUpdateInfo" autocomplete="off" novalidate>
+                        <input type="hidden" name="csrf_token" id="csrfTokenInfo" value="">
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Họ và tên <span class="req">*</span></label>
+                                <input type="text" name="ho_ten" id="inp_hoten"
+                                       placeholder="VD: NGUYỄN VĂN A" maxlength="100" required>
+                                <div class="field-error" id="err_hoten"><i class="fas fa-circle-exclamation"></i><span></span></div>
+                            </div>
+                        </div>
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Email</label>
+                                <input type="email" name="email" id="inp_email"
+                                       placeholder="example@tamtridongthap.vn" maxlength="100">
+                                <div class="field-error" id="err_email"><i class="fas fa-circle-exclamation"></i><span></span></div>
+                            </div>
+                        </div>
+                        <div class="form-row-p">
+                            <div class="form-group-p">
+                                <label>Ngày sinh</label>
+                                <input type="date" name="ngay_sinh" id="inp_ngaysinh">
+                                <div class="field-error" id="err_ngaysinh"><i class="fas fa-circle-exclamation"></i><span></span></div>
+                            </div>
+                            <div class="form-group-p">
+                                <label>Số điện thoại</label>
+                                <input type="tel" name="so_dien_thoai" id="inp_sdt"
+                                       placeholder="09xxxxxxxx" maxlength="15">
+                                <div class="field-error" id="err_sdt"><i class="fas fa-circle-exclamation"></i><span></span></div>
+                            </div>
+                        </div>
+                        <div class="form-row-p">
+                            <div class="form-group-p">
+                                <label>Mã nhân viên</label>
+                                <input type="text" id="inp_manv" disabled>
+                            </div>
+                            <div class="form-group-p">
+                                <label>Khoa / Phòng ban</label>
+                                <input type="text" id="inp_khoa" disabled>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-pane" id="tab-password">
+                    <div class="profile-alert" id="alertPassword"></div>
+                    <div class="reset-info-banner">
+                        <i class="fas fa-circle-info"></i>
+                        <span>Đặt lại mật khẩu mới cho tài khoản <strong id="resetUsernameLabel">của bạn</strong></span>
+                    </div>
+                    <form id="formChangePassword" autocomplete="off" novalidate>
+                        <input type="hidden" name="csrf_token" id="csrfTokenPassword" value="">
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Mật khẩu hiện tại <span class="req">*</span></label>
+                                <input type="password" name="current_password" id="inp_curPw"
+                                       placeholder="Nhập mật khẩu hiện tại"
+                                       required autocomplete="current-password">
+                                <div class="field-error" id="err_curPw"><i class="fas fa-circle-exclamation"></i><span></span></div>
+                            </div>
+                        </div>
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Mật khẩu mới <span class="req">*</span></label>
+                                <input type="password" name="new_password" id="inp_newPw"
+                                       placeholder="Nhập mật khẩu mới"
+                                       minlength="6" maxlength="255" required autocomplete="new-password">
+                                <div class="pw-rules" id="pwRules">
+                                    <div class="rule" data-rule="length"><i class="fas fa-circle"></i><span>Tối thiểu <strong>6 ký tự</strong></span></div>
+                                    <div class="rule" data-rule="upper"><i class="fas fa-circle"></i><span>Có ít nhất <strong>1 chữ in hoa</strong> (A-Z)</span></div>
+                                    <div class="rule" data-rule="lower"><i class="fas fa-circle"></i><span>Có ít nhất <strong>1 chữ thường</strong> (a-z)</span></div>
+                                    <div class="rule" data-rule="number"><i class="fas fa-circle"></i><span>Có ít nhất <strong>1 chữ số</strong> (0-9)</span></div>
+                                    <div class="rule" data-rule="special"><i class="fas fa-circle"></i><span>Có ít nhất <strong>1 ký tự đặc biệt</strong> (!@#$%...)</span></div>
+                                </div>
+                                <div class="field-error" id="err_newPw"><i class="fas fa-circle-exclamation"></i><span></span></div>
+                            </div>
+                        </div>
+                        <div class="form-row-p full">
+                            <div class="form-group-p">
+                                <label>Xác nhận mật khẩu mới <span class="req">*</span></label>
+                                <input type="password" name="confirm_password" id="inp_confirmPw"
+                                       placeholder="Nhập lại mật khẩu mới"
+                                       minlength="6" maxlength="255" required autocomplete="new-password">
+                                <div class="field-error" id="err_confirmPw"><i class="fas fa-circle-exclamation"></i><span></span></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel-p" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn-save-p" id="btnSaveProfile">
+                    <i class="fas fa-floppy-disk"></i>
+                    <span id="btnSaveLabel">Lưu thay đổi</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL LOGOUT -->
+<div class="modal fade" id="modalXacNhanDangXuat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden text-center p-3">
+            <div class="modal-body p-3">
+                <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width:55px;height:55px;">
+                    <i class="fas fa-arrow-right-from-bracket fs-4"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-2">Xác Nhận Đăng Xuất</h6>
+                <p class="text-muted small mb-0">Bạn có chắc muốn đăng xuất khỏi tài khoản này không?</p>
+            </div>
+            <div class="d-flex justify-content-center gap-2 pt-2 border-top">
+                <button type="button" class="btn btn-light rounded-pill px-3 btn-sm" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" id="btnConfirmLogout" class="btn btn-danger rounded-pill px-4 btn-sm fw-semibold">
+                    <i class="fas fa-arrow-right-from-bracket me-1"></i> Đăng xuất
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================ CONFIG ============================================================ */
+const CONFIG = {
+    API_HOME:        '../backend/api/trangchu.php',
+    API_NOTIF:       '../backend/api/thongbao.php',
+    API_LOGIN:       '../backend/api/dangnhap.php',
+    API_CSRF:        '../backend/api/csrf.php',
+    API_TIEPNHAN:    '../backend/api/tiepnhangiaynghiphep.php',
+    API_UPDATE_INFO: '../backend/api/capnhatthongtintaikhoan.php',
+    API_RESET_PW:    '../backend/api/datlaimatkhau.php',
+    LOGIN_PAGE:      'dangnhap.html',
+
+    ROUTES: {
+        home:            'trangchu.html',
+        taodon:          'taodonnghiphep.html',
+        lichsu:          'lichsudonnghiphep.html',
+        duyetTruongKhoa: 'truongkhoaduyetdonnghiphep.html',
+        duyetLanhDao:    'lanhdaoduyetdonnghiphep.html',
+        tiepNhan:        'tiepnhangiaynghiphep.html',
+        phepNam:         'quanlysophepduocnghi.html',
+        hoSo:            'hosonhansu.html',
+        baoCao:          'baocaothongkenghiphep.html',
+        xemdon:          'xemdonnghiphep.html',
+        in:              'indanhsachdonnghiphep.html'
+    }
+};
+
+const STATE = {
+    user: null,
+    csrfToken: '',
+    tab: 'pending',
+    pagination: null,
+    filters: { keyword: '' },
+    badges: { pending_count: 0 },
+    selectedIds: new Set()
+};
+
+/* ⭐ Mapping chức vụ */
+const CHUC_VU_MAP = {
+    'CEO': 'Giám đốc Điều hành',
+    'CMO': 'Giám đốc Chuyên môn',
+    'PGD': 'Phó Giám đốc',
+    'TRUONG_KHOA': 'Trưởng Khoa',
+    'PHO_KHOA': 'Phó Khoa',
+    'TRUONG_PHONG': 'Trưởng Phòng',
+    'PHO_PHONG': 'Phó Phòng',
+    'DIEU_DUONG_TRUONG_KHOA': 'Điều dưỡng trưởng Khoa',
+    'DIEU_DUONG_TRUONG_BV': 'Điều dưỡng trưởng Bệnh viện',
+    'BAC_SI_CHUYEN_KHOA': 'Bác sĩ Chuyên khoa',
+    'BAC_SI_DA_KHOA': 'Bác sĩ Đa khoa',
+    'BAC_SI_DIEU_TRI': 'Bác sĩ Điều trị',
+    'DIEU_DUONG': 'Điều dưỡng',
+    'NU_HO_SINH': 'Nữ hộ sinh',
+    'HO_LY': 'Hộ lý',
+    'KY_THUAT_VIEN': 'Kỹ thuật viên',
+    'DUOC_SI': 'Dược sĩ',
+    'DUOC_SI_LAM_SANG': 'Dược sĩ Lâm sàng',
+    'NHAN_VIEN_KE_TOAN': 'Nhân viên Kế toán',
+    'NHAN_VIEN_HANH_CHINH': 'Nhân viên Hành chính - Nhân sự',
+    'NHAN_VIEN_IT': 'Nhân viên Công nghệ thông tin',
+    'NHAN_VIEN_CSKH': 'Nhân viên Chăm sóc khách hàng',
+    'NHAN_VIEN_THU_NGAN': 'Nhân viên Thu ngân / Viện phí',
+    'Khác': 'Khác'
+};
+/* ⭐ Cập nhật hàm map để xử lý mọi định dạng chuỗi trả về (giống trangchu.html) */
+function getChucVuLabel(code) {
+    if (!code) return '';
+    const key = String(code).trim().toUpperCase().replace(/[\s\-]+/g, '_');
+    return CHUC_VU_MAP[key] || code;
+}
+
+function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function formatDate(s) {
+    if (!s || s === '0000-00-00') return '-';
+    const d = new Date(String(s).replace(' ', 'T'));
+    if (isNaN(d)) return '-';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${dd}/${mm}/${d.getFullYear()}`;
+}
+function formatDateTime(s) {
+    if (!s || s === '0000-00-00 00:00:00') return '-';
+    const d = new Date(String(s).replace(' ', 'T'));
+    if (isNaN(d)) return '-';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${d.getFullYear()} ${hh}:${mi}`;
+}
+function getBuoiNghiText(buoi) {
+    return { 'sang': 'Buổi sáng (0.5 ngày)', 'chieu': 'Buổi chiều (0.5 ngày)', 'ca_ngay': 'Nguyên ngày' }[buoi] || 'Nguyên ngày';
+}
+/* ⭐ Cập nhật getRoleLabel giống hệt trangchu.html để đồng bộ navbar */
+function getRoleLabel(role) {
+    const m = { 
+        'admin': 'Quản trị hệ thống', 'giam_doc': 'Giám đốc', 'giamdoc': 'Giám đốc',
+        'pho_giam_doc': 'Phó Giám đốc', 'phogiamdoc': 'Phó Giám đốc', 'pgd': 'Phó Giám đốc',
+        'ban_lanh_dao': 'Ban Lãnh đạo', 'lanh_dao': 'Ban Lãnh đạo',
+        'truong_khoa': 'Trưởng khoa', 'truongkhoa': 'Trưởng khoa',
+        'nhan_su': 'Nhân sự', 'nhansu': 'Nhân sự',
+        'nhan_vien': 'Nhân viên', 'nhanvien': 'Nhân viên'
+    };
+    return m[role] || 'Người dùng';
+}
+function isRole(role, ...names) { return names.includes(role); }
+function unwrapPayload(json) {
+    if (!json || typeof json !== 'object') return {};
+    if (json.data && typeof json.data === 'object' && !Array.isArray(json.data)) return json.data;
+    return json;
+}
+
+function showToast(message, options = {}) {
+    const { title = 'Thành công', type = 'success', duration = 3500, icon = null } = options;
+    const container = document.getElementById('toastContainer');
+    if (!container) return null;
+    const defaultIcon = type === 'error' ? 'fa-circle-xmark' : 'fa-circle-check';
+    const toast = document.createElement('div');
+    toast.className = 'toast-custom' + (type === 'error' ? ' toast-error' : '');
+    toast.innerHTML = `
+        <div class="toast-icon"><i class="fas ${icon || defaultIcon}"></i></div>
+        <div class="toast-body">
+            <div class="toast-title">${esc(title)}</div>
+            <div class="toast-message">${esc(message)}</div>
+        </div>
+        <button class="toast-close" type="button"><i class="fas fa-times"></i></button>`;
+    container.appendChild(toast);
+    let closed = false;
+    const close = () => { if (closed) return; closed = true; toast.classList.add('toast-hide'); setTimeout(() => toast.remove(), 320); };
+    toast.querySelector('.toast-close').addEventListener('click', close);
+    if (duration > 0) setTimeout(close, duration);
+    return { close, element: toast };
+}
+
+async function loadCsrfToken() {
+    try {
+        const res = await fetch(CONFIG.API_CSRF, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!res.ok) return '';
+        const data = await res.json();
+        const p = unwrapPayload(data);
+        if (p.csrf_token) {
+            STATE.csrfToken = p.csrf_token;
+            ['csrfTokenInfo', 'csrfTokenPassword', 'receiveCsrf'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = p.csrf_token;
+            });
+        }
+    } catch (e) { console.warn('[CSRF]', e); }
+    return '';
+}
+
+function renderSidebarMenu() {
+    const role = STATE.user?.vai_tro || '';
+    const isAdmin      = isRole(role, 'admin');
+    const isLanhDao    = isRole(role, 'giam_doc', 'giamdoc', 'ban_lanh_dao', 'lanh_dao');
+    const isTruongKhoa = isRole(role, 'truong_khoa', 'truongkhoa');
+    const isNhanSu     = isRole(role, 'nhan_su', 'nhansu');
+
+    let html = '';
+    html += `<li class="menu-category">MENU CHỨC NĂNG</li>
+             <li class="menu-item"><a href="${CONFIG.ROUTES.home}"><i class="fas fa-th-large"></i><span>Tổng quan</span></a></li>`;
+
+    html += `<li class="menu-category">Nghỉ phép</li>
+             <li class="menu-item"><a href="${CONFIG.ROUTES.taodon}"><i class="fas fa-file-circle-plus"></i><span>Tạo giấy nghỉ phép</span></a></li>
+             <li class="menu-item"><a href="${CONFIG.ROUTES.lichsu}"><i class="fas fa-clock-rotate-left"></i><span>Lịch sử đã xin nghỉ</span></a></li>`;
+
+    if (isTruongKhoa || isLanhDao || isAdmin) {
+        html += `<li class="menu-category">Phê duyệt</li>`;
+        if (isTruongKhoa || isAdmin) html += `<li class="menu-item"><a href="${CONFIG.ROUTES.duyetTruongKhoa}"><i class="fas fa-user-check"></i><span>Trưởng khoa phê duyệt</span></a></li>`;
+        if (isLanhDao || isAdmin)   html += `<li class="menu-item"><a href="${CONFIG.ROUTES.duyetLanhDao}"><i class="fas fa-signature"></i><span>Lãnh đạo phê duyệt</span></a></li>`;
+    }
+
+    if (isNhanSu || isAdmin) {
+        html += `<li class="menu-category">Phòng nhân sự</li>
+                 <li class="menu-item active"><a href="${CONFIG.ROUTES.tiepNhan}"><i class="fas fa-file-import"></i><span>Tiếp nhận đơn nghỉ</span>${STATE.badges.pending_count > 0 ? `<span class="menu-badge">${STATE.badges.pending_count}</span>` : ''}</a></li>
+                 <li class="menu-item"><a href="${CONFIG.ROUTES.phepNam}"><i class="fas fa-calendar-check"></i><span>Quản lý ngày phép</span></a></li>
+                 <li class="menu-item"><a href="${CONFIG.ROUTES.hoSo}"><i class="fas fa-users"></i><span>Quản lý nhân viên</span></a></li>`;
+    }
+
+    if (isAdmin || isLanhDao || isNhanSu) {
+        html += `<li class="menu-category">Thống kê</li>
+                 <li class="menu-item"><a href="${CONFIG.ROUTES.baoCao}"><i class="fas fa-chart-line"></i><span>Báo cáo nghỉ phép</span></a></li>`;
+    }
+
+    document.getElementById('sidebarMenu').innerHTML = html;
+}
+
+function fillUserInfo() {
+    const u = STATE.user || {};
+    const name = u.ho_ten || u.username || 'Người dùng';
+    
+    // ⭐ ĐÃ FIX: Bọc u.chuc_vu qua getChucVuLabel để dịch mã code sang tiếng Việt
+    const role = getChucVuLabel(u.chuc_vu) || getRoleLabel(u.vai_tro);
+    const khoa = u.ten_khoa || '';
+
+    document.getElementById('sbUserName').textContent = name;
+    document.getElementById('sbUserRole').textContent = role + (khoa ? ' · ' + khoa : '');
+    document.getElementById('navUserName').textContent = name;
+    document.getElementById('navUserRole').textContent = getRoleLabel(u.vai_tro);
+    document.getElementById('ddUserName').textContent = name;
+    document.getElementById('ddUserRole').textContent = getRoleLabel(u.vai_tro);
+    document.getElementById('ddUserDept').textContent = khoa || 'Bộ phận chưa cập nhật';
+    document.getElementById('receiveCanBo').value = name;
+
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    setVal('inp_hoten', u.ho_ten ? String(u.ho_ten).toUpperCase() : '');
+    setVal('inp_email', u.email);
+    setVal('inp_ngaysinh', u.ngay_sinh);
+    setVal('inp_sdt', u.so_dien_thoai);
+    setVal('inp_manv', u.ma_nv || '---');
+    setVal('inp_khoa', u.ten_khoa || '---');
+}
+
+async function checkAuth() {
+    try {
+        const res = await fetch(`${CONFIG.API_HOME}?action=check`, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const data = await res.json();
+        if (!data.logged_in) { window.location.href = CONFIG.LOGIN_PAGE; return false; }
+        STATE.user = data.employee ? { ...data.user, ...data.employee, vai_tro: data.user.vai_tro, username: data.user.username } : data.user;
+        const role = STATE.user.vai_tro || '';
+        if (!['nhan_su', 'nhansu', 'admin'].includes(role)) {
+            alert('Bạn không có quyền truy cập chức năng này!');
+            window.location.href = CONFIG.ROUTES.home;
+            return false;
+        }
+        return true;
+    } catch (e) { console.error('[Auth]', e); window.location.href = CONFIG.LOGIN_PAGE; return false; }
+}
+
+function getNotifIcon(title) {
+    const t = String(title || '').toLowerCase();
+    if (t.includes('tiếp nhận')) return { bg: '#ecfeff', color: '#06b6d4', icon: 'fa-inbox' };
+    if (t.includes('phê duyệt') || t.includes('đã duyệt')) return { bg: '#ecfdf5', color: '#10b981', icon: 'fa-check-circle' };
+    if (t.includes('từ chối')) return { bg: '#fef2f2', color: '#ef4444', icon: 'fa-times-circle' };
+    return { bg: '#eff6ff', color: '#3b82f6', icon: 'fa-info-circle' };
+}
+function renderNotifItem(n) {
+    const ic = getNotifIcon(n.tieu_de);
+    const link = n.link ? esc(n.link) : '#';
+    return `
+        <a href="${link}" class="notif-item">
+            <div class="notif-icon" style="background:${ic.bg};color:${ic.color};"><i class="fas ${ic.icon}"></i></div>
+            <div class="notif-body">
+                <div class="notif-title">${esc(n.tieu_de)}</div>
+                <div class="notif-content">${esc(n.noi_dung)}</div>
+                <div class="notif-time"><i class="far fa-clock"></i> ${esc(n.created_at || '')}</div>
+            </div>
+        </a>`;
+}
+async function loadNotifications() {
+    const container  = document.getElementById('notifScrollContainer');
+    const badgeCount = document.getElementById('notifBadgeCount');
+    const markAllBtn = document.getElementById('notifMarkAllBtn');
+    try {
+        const res = await fetch(`${CONFIG.API_NOTIF}?action=list&filter=unread`, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const json = await res.json();
+        if (!json.success) throw new Error();
+        const unreadCount = Number(json.unread_count || 0);
+        const list = (json.notifications || []).filter(n => Number(n.da_doc) === 0);
+        if (unreadCount > 0) {
+            badgeCount.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            badgeCount.classList.remove('d-none');
+            markAllBtn.classList.remove('d-none');
+        } else {
+            badgeCount.classList.add('d-none');
+            markAllBtn.classList.add('d-none');
+        }
+        if (list.length === 0) {
+            container.innerHTML = `<div class="notif-empty-state"><i class="fas fa-bell-slash"></i><div class="mt-2">Không có thông báo chưa đọc</div></div>`;
+            return;
+        }
+        container.innerHTML = list.map(renderNotifItem).join('');
+    } catch (e) {
+        container.innerHTML = `<div class="notif-empty-state"><i class="fas fa-bell-slash"></i><div class="mt-2">Không tải được thông báo</div></div>`;
+    }
+}
+function initNotifActions() {
+    document.body.addEventListener('click', async function (e) {
+        const btn = e.target.closest('#notifMarkAllBtn');
+        if (!btn) return;
+        try {
+            const res = await fetch(`${CONFIG.API_NOTIF}?action=mark_all_read`, { method: 'POST', credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('notifBadgeCount').classList.add('d-none');
+                document.getElementById('notifMarkAllBtn').classList.add('d-none');
+                document.getElementById('notifScrollContainer').innerHTML =
+                    `<div class="notif-empty-state"><i class="fas fa-bell-slash"></i><div class="mt-2">Không có thông báo chưa đọc</div></div>`;
+            }
+        } catch (err) {}
+    });
+}
+
+(function () {
+    const sidebar = document.getElementById('appSidebar');
+    const overlay = document.getElementById('sbOverlay');
+    const btn = document.getElementById('sidebarToggle');
+    const open = () => { sidebar.classList.add('open'); overlay.classList.add('show'); };
+    const close = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+    btn?.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
+    overlay?.addEventListener('click', close);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+})();
+
+function initTabs() {
+    document.getElementById('tabPending').addEventListener('click', () => switchTab('pending'));
+    document.getElementById('tabReceived').addEventListener('click', () => switchTab('received'));
+}
+function switchTab(tab) {
+    STATE.tab = tab;
+    STATE.selectedIds.clear();
+    document.getElementById('tabPending').classList.toggle('active', tab === 'pending');
+    document.getElementById('tabReceived').classList.toggle('active', tab === 'received');
+    document.getElementById('tableTitle').textContent = (tab === 'pending') ? 'Danh Sách Chờ Tiếp Nhận' : 'Danh Sách Đã Tiếp Nhận';
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tab);
+    url.searchParams.delete('page');
+    window.history.replaceState({}, '', url.toString());
+    loadList();
+}
+
+function updateBulkActionBar() {
+    const bar = document.getElementById('bulkActionBar');
+    const countEl = document.getElementById('selectedCount');
+    if (!bar || !countEl) return;
+
+    if (STATE.tab === 'pending' && STATE.selectedIds.size > 0) {
+        bar.classList.remove('d-none');
+        countEl.textContent = STATE.selectedIds.size;
+    } else {
+        bar.classList.add('d-none');
+    }
+}
+
+async function loadList() {
+    STATE.selectedIds.clear();
+    updateBulkActionBar();
+    
+    const container = document.getElementById('tableContainer');
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div><div class="empty-title">Đang tải dữ liệu...</div></div>`;
+
+    const params = new URLSearchParams();
+    params.set('action', 'list');
+    params.set('tab', STATE.tab);
+    if (STATE.filters.keyword) params.set('keyword', STATE.filters.keyword);
+    params.set('page', new URLSearchParams(window.location.search).get('page') || '1');
+
+    try {
+        const res = await fetch(`${CONFIG.API_TIEPNHAN}?${params.toString()}`, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message || 'Lỗi tải dữ liệu');
+        const payload = unwrapPayload(json);
+        if (payload.user)   { STATE.user = { ...STATE.user, ...payload.user }; fillUserInfo(); }
+        if (payload.badges) { STATE.badges = payload.badges; renderSidebarMenu(); }
+        renderList(payload.list || []);
+        STATE.pagination = payload.pagination;
+        renderPagination(payload.pagination);
+        document.getElementById('totalPill').textContent = payload.pagination?.total_rows || 0;
+    } catch (e) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-icon" style="background:#fef2f2;color:#dc2626;"><i class="fas fa-triangle-exclamation"></i></div><div class="empty-title">Không thể tải dữ liệu</div><div class="empty-sub">${esc(e.message)}</div></div>`;
+    }
+}
+
+function renderList(list) {
+    const container = document.getElementById('tableContainer');
+    if (!list || list.length === 0) {
+        const hasFilter = STATE.filters.keyword !== '';
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                <div class="empty-title">Không có dữ liệu</div>
+                <div class="empty-sub">${hasFilter ? 'Không tìm thấy giấy nghỉ phép nào phù hợp với từ khóa tìm kiếm.' : (STATE.tab === 'pending' ? 'Không có giấy nghỉ phép nào đang chờ Phòng Nhân sự tiếp nhận.' : 'Chưa có giấy nghỉ phép nào đã được tiếp nhận.')}</div>
+                ${hasFilter ? `<div class="mt-3"><button type="button" class="btn-f btn-f-outline" id="btnResetEmpty"><i class="fas fa-rotate-left"></i> Xóa bộ lọc</button></div>` : ''}
+            </div>`;
+        const btnResetEmpty = document.getElementById('btnResetEmpty');
+        if (btnResetEmpty) btnResetEmpty.addEventListener('click', resetFilter);
+        return;
+    }
+
+    const isTabPending = (STATE.tab === 'pending');
+    const offset = STATE.pagination?.offset || 0;
+    
+    const rowsHtml = list.map((row, idx) => {
+        const stt = offset + idx + 1;
+        const isPending = (row.trang_thai === 'da_duyet');
+        const badgeClass = isPending ? 'sb-info' : 'sb-success';
+        const badgeText  = isPending ? 'Chờ tiếp nhận' : 'Đã tiếp nhận';
+        
+        const checkboxHtml = isTabPending ? `
+            <td style="text-align:center;">
+                <input type="checkbox" class="row-checkbox form-check-input" 
+                       value="${row.id}" style="cursor: pointer; width: 18px; height: 18px;">
+            </td>` : '';
+
+        let receiptInfoHtml = '';
+        if (row.ngay_nop_nhan_su) {
+            receiptInfoHtml = `
+                <div class="receipt-info">
+                    <div class="ri-date">${formatDate(row.ngay_nop_nhan_su)}</div>
+                    ${row.ngay_tiep_nhan ? `<div class="ri-meta">${formatDateTime(row.ngay_tiep_nhan)}</div>` : ''}
+                    ${row.nhan_su_ten ? `<div class="ri-meta"><i class="fas fa-user-tie"></i> ${esc(row.nhan_su_ten)}</div>` : ''}
+                </div>`;
+        } else {
+            receiptInfoHtml = `
+                <div class="receipt-info" style="margin-bottom:6px;"><div class="ri-meta">Ngày gửi: ${formatDate(row.created_at)}</div></div>
+                <span class="waiting-badge">Chờ tiếp nhận</span>`;
+        }
+
+        const fromParam = encodeURIComponent('tiepnhangiaynghiphep.html');
+        const xemdonUrl = `${CONFIG.ROUTES.xemdon}?id=${row.id}&from=${fromParam}`;
+        const inUrl = `${CONFIG.ROUTES.in}?id=${row.id}&print=1&from=${fromParam}`;
+        const chucVuLabel = getChucVuLabel(row.chuc_vu) || 'Chưa cập nhật';
+
+        return `
+            <tr id="row-${row.id}">
+                ${checkboxHtml}
+                <td class="td-stt">${stt}</td>
+                <td><span class="code-badge">${esc(row.ma_don)}</span></td>
+                <td><div class="emp-name">${esc(row.ho_ten)}</div><div class="emp-role">${esc(row.ma_nv)} · ${esc(chucVuLabel)}</div></td>
+                <td><span class="khoa-cell">${esc(row.ten_khoa)}</span></td>
+                <td>
+                    <div class="time-cell">
+                        <div class="time-main"><i class="far fa-calendar-alt"></i> ${formatDate(row.tu_ngay)} &rarr; ${formatDate(row.den_ngay)}</div>
+                        <span class="time-sub">(${esc(getBuoiNghiText(row.buoi_nghi))})</span>
+                    </div>
+                </td>
+                <td><span class="day-badge">${row.so_ngay}</span></td>
+                <td>${row.so_phep_con_lai_luc_nghi !== null && row.so_phep_con_lai_luc_nghi !== undefined ? `<span class="leave-remain-badge">${row.so_phep_con_lai_luc_nghi}</span>` : '<span class="text-muted">—</span>'}</td>
+                <td><span style="font-size:14px;color:#64748b;">${formatDate(row.ngay_phe_duyet)}</span></td>
+                <td>${receiptInfoHtml}</td>
+                <td><span class="status-badge ${badgeClass}">${badgeText}</span></td>
+                <td>
+                    <div class="d-flex gap-1 justify-content-end">
+                        <a href="${xemdonUrl}" class="action-btn action-btn-view" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem</a>
+                        ${!isPending ? `<a href="${inUrl}" class="action-btn action-btn-print" title="In giấy A4" target="_blank"><i class="fas fa-print"></i> In</a>` : ''}
+                        ${isPending ? `
+                            <button type="button" class="action-btn action-btn-receive btn-open-receive"
+                                    data-id="${row.id}" data-ma-don="${esc(row.ma_don)}"
+                                    data-ho-ten="${esc(row.ho_ten)}" data-chuc-vu="${esc(chucVuLabel)}"
+                                    data-ten-khoa="${esc(row.ten_khoa)}"
+                                    data-tu-ngay="${esc(row.tu_ngay)}" data-den-ngay="${esc(row.den_ngay)}"
+                                    data-so-ngay="${row.so_ngay}" data-buoi-nghi="${esc(row.buoi_nghi)}"
+                                    data-ngay-gui="${esc(row.created_at)}" data-ngay-duyet="${esc(row.ngay_phe_duyet)}"
+                                    title="Tiếp nhận">
+                                <i class="fas fa-check"></i> Tiếp nhận
+                            </button>` : ''}
+                    </div>
+                </td>
+            </tr>`;
+    }).join('');
+
+    const headerCheckboxHtml = isTabPending ? `
+        <th style="text-align:center; width: 40px;">
+            <input type="checkbox" id="checkAllRows" class="form-check-input" style="cursor: pointer; width: 18px; height: 18px;">
+        </th>` : '';
+
+    container.innerHTML = `
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        ${headerCheckboxHtml}
+                        <th>STT</th>
+                        <th>Mã Đơn</th>
+                        <th>Nhân Viên</th>
+                        <th>Phòng Khoa</th>
+                        <th>Thời Gian Nghỉ</th>
+                        <th>Số Ngày</th>
+                        <th>Phép Còn Lại</th>
+                        <th>Ngày Duyệt</th>
+                        <th>Thời gian Tiếp Nhận</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>
+        </div>`;
+
+    container.querySelectorAll('.btn-open-receive').forEach(btn => {
+        btn.addEventListener('click', () => openReceiveModal(btn.dataset));
+    });
+
+    if (isTabPending) {
+        const checkAll = document.getElementById('checkAllRows');
+        const rowChecks = container.querySelectorAll('.row-checkbox');
+        
+        if (checkAll) {
+            checkAll.checked = false;
+            checkAll.indeterminate = false;
+        }
+
+        checkAll?.addEventListener('change', function() {
+            const isChecked = this.checked;
+            rowChecks.forEach(cb => {
+                cb.checked = isChecked;
+                const tr = cb.closest('tr');
+                if (isChecked) {
+                    STATE.selectedIds.add(Number(cb.value));
+                    tr?.classList.add('row-selected');
+                } else {
+                    STATE.selectedIds.delete(Number(cb.value));
+                    tr?.classList.remove('row-selected');
+                }
+            });
+            updateBulkActionBar();
+        });
+
+        rowChecks.forEach(cb => {
+            cb.addEventListener('change', function() {
+                const tr = this.closest('tr');
+                if (this.checked) {
+                    STATE.selectedIds.add(Number(this.value));
+                    tr?.classList.add('row-selected');
+                } else {
+                    STATE.selectedIds.delete(Number(this.value));
+                    tr?.classList.remove('row-selected');
+                }
+                
+                if (checkAll) {
+                    const allChecked = Array.from(rowChecks).every(c => c.checked);
+                    const someChecked = Array.from(rowChecks).some(c => c.checked);
+                    checkAll.checked = allChecked;
+                    checkAll.indeterminate = someChecked && !allChecked;
+                }
+                
+                updateBulkActionBar();
+            });
+        });
+    }
+}
+
+function renderPagination(pg) {
+    const wrap = document.getElementById('paginationWrap');
+    const bar  = document.getElementById('paginationBar');
+    const info = document.getElementById('paginationInfo');
+    if (!pg || pg.total_pages <= 1) { wrap.classList.add('d-none'); return; }
+    wrap.classList.remove('d-none');
+
+    const buildUrl = (p) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', STATE.tab);
+        url.searchParams.set('page', p);
+        if (STATE.filters.keyword) url.searchParams.set('keyword', STATE.filters.keyword);
+        return url.pathname + url.search;
+    };
+
+    let html = '';
+    html += pg.page > 1 ? `<a class="page-btn" href="${buildUrl(pg.page - 1)}"><i class="fas fa-chevron-left"></i></a>` : `<span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span>`;
+    const start = Math.max(1, pg.page - 2);
+    const end = Math.min(pg.total_pages, pg.page + 2);
+    if (start > 1) { html += `<a class="page-btn" href="${buildUrl(1)}">1</a>`; if (start > 2) html += `<span class="page-btn ellipsis">…</span>`; }
+    for (let i = start; i <= end; i++) html += (i === pg.page) ? `<span class="page-btn active">${i}</span>` : `<a class="page-btn" href="${buildUrl(i)}">${i}</a>`;
+    if (end < pg.total_pages) { if (end < pg.total_pages - 1) html += `<span class="page-btn ellipsis">…</span>`; html += `<a class="page-btn" href="${buildUrl(pg.total_pages)}">${pg.total_pages}</a>`; }
+    html += pg.page < pg.total_pages ? `<a class="page-btn" href="${buildUrl(pg.page + 1)}"><i class="fas fa-chevron-right"></i></a>` : `<span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span>`;
+    bar.innerHTML = html;
+
+    const from = (pg.page - 1) * pg.per_page + 1;
+    const to = Math.min(pg.page * pg.per_page, pg.total_rows);
+    info.innerHTML = `Hiển thị <strong>${from}</strong>–<strong>${to}</strong> trên <strong>${pg.total_rows}</strong> bản ghi`;
+}
+
+function openReceiveModal(data) {
+    document.getElementById('receiveDonId').value = data.id || '';
+    document.getElementById('receiveMaDon').textContent = data.maDon || '—';
+    document.getElementById('receiveHoTen').textContent = (data.hoTen || '').trim() || '—';
+    document.getElementById('receiveChucVu').textContent = data.chucVu || 'Chưa cập nhật chức vụ';
+    document.getElementById('receiveTenKhoa').textContent = data.tenKhoa || 'Chưa cập nhật khoa';
+    document.getElementById('receiveTuNgay').innerHTML = `<i class="far fa-calendar-alt"></i> ${esc(formatDate(data.tuNgay))}`;
+    document.getElementById('receiveDenNgay').innerHTML = `<i class="far fa-calendar-alt"></i> ${esc(formatDate(data.denNgay))}`;
+    document.getElementById('receiveBuoi').textContent = getBuoiNghiText(data.buoiNghi);
+    document.getElementById('receiveSoNgay').innerHTML = `<span>${esc(data.soNgay)}</span> <small>ngày</small>`;
+    document.getElementById('receiveNgayGui').innerHTML = `<i class="far fa-paper-plane"></i> ${esc(formatDateTime(data.ngayGui))}`;
+    document.getElementById('receiveNgayDuyet').innerHTML = `<i class="far fa-circle-check"></i> ${esc(formatDateTime(data.ngayDuyet))}`;
+
+    const defaultDate = data.ngayGui ? String(data.ngayGui).split(' ')[0] : new Date().toISOString().split('T')[0];
+    document.getElementById('receiveNgayNop').value = defaultDate;
+    document.getElementById('receiveNgayGuiDefault').textContent = formatDate(data.ngayGui);
+
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReceive'));
+    modal.show();
+}
+
+async function submitReceive(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmitReceive');
+    const donId = document.getElementById('receiveDonId').value;
+    const ngayNop = document.getElementById('receiveNgayNop').value;
+    if (!donId) return;
+    if (!ngayNop) { showToast('Vui lòng chọn ngày nộp giấy.', { type: 'error', title: 'Thiếu thông tin' }); return; }
+
+    btn.disabled = true;
+    const oldHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+    const fd = new FormData();
+    fd.set('action', 'receive');
+    fd.set('don_id', donId);
+    fd.set('ngay_nop_nhan_su', ngayNop);
+    fd.set('csrf_token', STATE.csrfToken);
+
+    try {
+        const res = await fetch(CONFIG.API_TIEPNHAN, { method: 'POST', body: fd, credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const data = await res.json();
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('modalReceive'))?.hide();
+            showToast(data.message || 'Tiếp nhận thành công!', { title: 'Đã tiếp nhận đơn', type: 'success' });
+            await loadList();
+        } else {
+            showToast(data.message || 'Không thể tiếp nhận!', { type: 'error', title: 'Lỗi' });
+        }
+    } catch (err) {
+        showToast('Lỗi kết nối: ' + err.message, { type: 'error', title: 'Lỗi' });
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+    }
+}
+
+/* ⭐ HÀM XỬ LÝ TIẾP NHẬN HÀNG LOẠT */
+async function submitBulkReceive() {
+    if (STATE.selectedIds.size === 0) return;
+
+    const btn = document.getElementById('btnBulkReceive');
+    const oldHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+    const ids = Array.from(STATE.selectedIds);
+
+    try {
+        const res = await fetch(CONFIG.API_TIEPNHAN, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest' 
+            },
+            body: JSON.stringify({
+                action: 'receive_bulk',
+                ids: ids,
+                csrf_token: STATE.csrfToken
+            }),
+            credentials: 'include'
+        });
+        
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error(`Lỗi HTTP ${res.status}: Máy chủ không trả về JSON (có thể lỗi PHP).`);
+        }
+
+        const data = await res.json();
+        
+        if (data.success) {
+            showToast(data.message || `Đã tiếp nhận thành công ${ids.length} đơn.`, { title: 'Hoàn tất', type: 'success' });
+            STATE.selectedIds.clear();
+            await loadList();
+        } else {
+            showToast(data.message || 'Có lỗi xảy ra khi tiếp nhận hàng loạt!', { type: 'error', title: 'Lỗi' });
+        }
+    } catch (err) {
+        showToast('Lỗi: ' + err.message, { type: 'error', title: 'Không thể kết nối' });
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+    }
+}
+
+function initFilter() {
+    document.getElementById('filterForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        STATE.filters.keyword = document.getElementById('filterKeyword').value.trim();
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', STATE.tab);
+        url.searchParams.delete('page');
+        if (STATE.filters.keyword) url.searchParams.set('keyword', STATE.filters.keyword);
+        else url.searchParams.delete('keyword');
+        window.history.replaceState({}, '', url.toString());
+        loadList();
+    });
+    document.getElementById('btnResetFilter').addEventListener('click', resetFilter);
+}
+function resetFilter() {
+    STATE.filters.keyword = '';
+    document.getElementById('filterKeyword').value = '';
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', STATE.tab);
+    url.searchParams.delete('page');
+    url.searchParams.delete('keyword');
+    window.history.replaceState({}, '', url.toString());
+    loadList();
+}
+
+function validateHoTen(name) {
+    const val = String(name || '').trim();
+    if (val === '') return { ok: false, msg: 'Họ và tên không được để trống.' };
+    if (val.length < 2) return { ok: false, msg: 'Họ và tên phải có ít nhất 2 ký tự.' };
+    if (val.length > 100) return { ok: false, msg: 'Họ và tên quá dài (tối đa 100 ký tự).' };
+    if (!/^[\p{L}\s]+$/u.test(val)) return { ok: false, msg: 'Họ và tên chỉ được chứa chữ cái và khoảng trắng.' };
+    return { ok: true };
+}
+function validateEmail(email) {
+    const val = String(email || '').trim();
+    if (val === '') return { ok: true };
+    if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(val)) return { ok: false, msg: 'Email không đúng định dạng.' };
+    return { ok: true };
+}
+function validatePhone(phone) {
+    const val = String(phone || '').trim();
+    if (val === '') return { ok: true };
+    if (!/^(0|\+84)(3|5|7|8|9)[0-9]{8}$/.test(val.replace(/[\s\.\-]/g, ''))) return { ok: false, msg: 'SĐT không hợp lệ.' };
+    return { ok: true };
+}
+function validateNgaySinh(dateStr) {
+    const val = String(dateStr || '').trim();
+    if (val === '') return { ok: true };
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return { ok: false, msg: 'Ngày sinh không đúng định dạng.' };
+    const today = new Date();
+    if (d > today) return { ok: false, msg: 'Ngày sinh không thể ở tương lai.' };
+    let age = today.getFullYear() - d.getFullYear();
+    const m = today.getMonth() - d.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+    if (age < 23) return { ok: false, msg: `Tuổi phải từ 23 trở lên.` };
+    if (age > 65) return { ok: false, msg: `Tuổi không được vượt quá 65.` };
+    return { ok: true };
+}
+function checkPasswordStrength(pw) {
+    return { length: pw.length >= 6, upper: /[A-Z]/.test(pw), lower: /[a-z]/.test(pw), number: /[0-9]/.test(pw), special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pw) };
+}
+function getPasswordError(pw) {
+    if (!pw || pw.length === 0) return 'Vui lòng nhập mật khẩu mới.';
+    if (pw.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự.';
+    if (!/[A-Z]/.test(pw)) return 'Cần ít nhất 1 chữ in hoa.';
+    if (!/[a-z]/.test(pw)) return 'Cần ít nhất 1 chữ thường.';
+    if (!/[0-9]/.test(pw)) return 'Cần ít nhất 1 chữ số.';
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pw)) return 'Cần ít nhất 1 ký tự đặc biệt.';
+    return '';
+}
+function setFieldError(fieldId, errorId, message) {
+    const input = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    if (!input || !errEl) return;
+    if (message) { input.classList.add('is-invalid'); errEl.querySelector('span').textContent = message; errEl.classList.add('show'); }
+    else { input.classList.remove('is-invalid'); errEl.querySelector('span').textContent = ''; errEl.classList.remove('show'); }
+}
+function clearAllFieldErrors() {
+    ['inp_hoten', 'inp_email', 'inp_ngaysinh', 'inp_sdt', 'inp_curPw', 'inp_newPw', 'inp_confirmPw'].forEach(id => { const i = document.getElementById(id); if (i) i.classList.remove('is-invalid'); });
+    ['err_hoten', 'err_email', 'err_ngaysinh', 'err_sdt', 'err_curPw', 'err_newPw', 'err_confirmPw'].forEach(id => { const e = document.getElementById(id); if (e) e.classList.remove('show'); });
+}
+function showModalAlert(id, type, message) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('success', 'error');
+    el.classList.add('show', type);
+    el.textContent = message;
+}
+function updatePwRules(pw) {
+    const checks = checkPasswordStrength(pw);
+    document.querySelectorAll('#pwRules .rule').forEach(rule => {
+        const key = rule.dataset.rule;
+        const icon = rule.querySelector('i');
+        if (checks[key]) { rule.classList.add('ok'); icon.classList.remove('fa-circle'); icon.classList.add('fa-check-circle'); }
+        else { rule.classList.remove('ok'); icon.classList.remove('fa-check-circle'); icon.classList.add('fa-circle'); }
+    });
+    return Object.values(checks).every(Boolean);
+}
+
+document.getElementById('inp_hoten')?.addEventListener('blur', function () { this.value = this.value.trim().replace(/\s+/g, ' '); if (this.value) this.value = this.value.toLocaleUpperCase('vi-VN'); const r = validateHoTen(this.value); setFieldError('inp_hoten', 'err_hoten', r.ok ? '' : r.msg); });
+document.getElementById('inp_email')?.addEventListener('blur', function () { const r = validateEmail(this.value); setFieldError('inp_email', 'err_email', r.ok ? '' : r.msg); });
+document.getElementById('inp_sdt')?.addEventListener('blur', function () { const r = validatePhone(this.value); setFieldError('inp_sdt', 'err_sdt', r.ok ? '' : r.msg); });
+document.getElementById('inp_ngaysinh')?.addEventListener('blur', function () { const r = validateNgaySinh(this.value); setFieldError('inp_ngaysinh', 'err_ngaysinh', r.ok ? '' : r.msg); });
+document.getElementById('inp_newPw')?.addEventListener('input', function () { updatePwRules(this.value); if (this.value) setFieldError('inp_newPw', 'err_newPw', ''); });
+document.getElementById('inp_confirmPw')?.addEventListener('input', function () { const newPw = document.getElementById('inp_newPw').value; if (this.value && this.value === newPw) setFieldError('inp_confirmPw', 'err_confirmPw', ''); });
+
+function initProfileModal() {
+    const modal = document.getElementById('modalThongTinTaiKhoan');
+    const tabs = modal.querySelectorAll('.profile-tab');
+    const panes = modal.querySelectorAll('.tab-pane');
+    const btnSave = document.getElementById('btnSaveProfile');
+    const btnLabel = document.getElementById('btnSaveLabel');
+    let currentTab = 'info';
+
+    function switchTab(target) {
+        currentTab = target;
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === target));
+        panes.forEach(p => p.classList.toggle('active', p.id === 'tab-' + target));
+        btnLabel.textContent = (target === 'password') ? 'Đặt lại mật khẩu' : 'Lưu thay đổi';
+        if (target === 'password') {
+            const label = document.getElementById('resetUsernameLabel');
+            if (label) {
+                const u = STATE.user || {};
+                label.textContent = u.ma_nv ? `"${u.ma_nv}"` : (u.username ? `"${u.username}"` : 'của bạn');
+            }
+        }
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+    modal.addEventListener('show.bs.modal', async function (event) {
+        const trigger = event.relatedTarget;
+        const tab = (trigger && trigger.dataset.openTab) ? trigger.dataset.openTab : 'info';
+        switchTab(tab);
+        document.getElementById('alertInfo')?.classList.remove('show');
+        document.getElementById('alertPassword')?.classList.remove('show');
+        clearAllFieldErrors();
+        if (!STATE.csrfToken) await loadCsrfToken();
+        const a = document.getElementById('csrfTokenInfo');
+        const b = document.getElementById('csrfTokenPassword');
+        if (a) a.value = STATE.csrfToken;
+        if (b) b.value = STATE.csrfToken;
+        fillUserInfo();
+        updatePwRules('');
+    });
+    btnSave.addEventListener('click', async () => {
+        if (currentTab === 'password') await submitChangePassword();
+        else await submitUpdateInfo();
+    });
+}
+
+async function submitUpdateInfo() {
+    const btn = document.getElementById('btnSaveProfile');
+    clearAllFieldErrors();
+    let hotenVal = document.getElementById('inp_hoten').value.trim();
+    hotenVal = hotenVal.replace(/\s+/g, ' ').toLocaleUpperCase('vi-VN');
+    document.getElementById('inp_hoten').value = hotenVal;
+    const emailVal = document.getElementById('inp_email').value.trim();
+    const sdtVal   = document.getElementById('inp_sdt').value.trim();
+    const nsVal    = document.getElementById('inp_ngaysinh').value.trim();
+
+    let hasError = false, firstErrFieldId = null;
+    const r1 = validateHoTen(hotenVal); if (!r1.ok) { setFieldError('inp_hoten', 'err_hoten', r1.msg); hasError = true; firstErrFieldId = firstErrFieldId || 'inp_hoten'; }
+    const r2 = validateEmail(emailVal); if (!r2.ok) { setFieldError('inp_email', 'err_email', r2.msg); hasError = true; firstErrFieldId = firstErrFieldId || 'inp_email'; }
+    const r3 = validatePhone(sdtVal); if (!r3.ok) { setFieldError('inp_sdt', 'err_sdt', r3.msg); hasError = true; firstErrFieldId = firstErrFieldId || 'inp_sdt'; }
+    const r4 = validateNgaySinh(nsVal); if (!r4.ok) { setFieldError('inp_ngaysinh', 'err_ngaysinh', r4.msg); hasError = true; firstErrFieldId = firstErrFieldId || 'inp_ngaysinh'; }
+    if (hasError) { document.getElementById(firstErrFieldId)?.focus(); showModalAlert('alertInfo', 'error', 'Vui lòng kiểm tra lại các trường báo đỏ.'); return; }
+
+    const fd = new FormData(document.getElementById('formUpdateInfo'));
+    btn.disabled = true;
+    const ic = btn.querySelector('i'); const oldIcon = ic ? ic.className : '';
+    if (ic) ic.className = 'fas fa-spinner fa-spin';
+
+    try {
+        const res = await fetch(CONFIG.API_UPDATE_INFO, { method: 'POST', body: fd, credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const data = await res.json();
+        if (data.success) {
+            showModalAlert('alertInfo', 'success', data.message || 'Cập nhật thành công!');
+            if (!STATE.user) STATE.user = {};
+            STATE.user.ho_ten = hotenVal; STATE.user.email = emailVal; STATE.user.ngay_sinh = nsVal; STATE.user.so_dien_thoai = sdtVal;
+            fillUserInfo(); renderSidebarMenu();
+        } else showModalAlert('alertInfo', 'error', data.message || 'Cập nhật thất bại!');
+    } catch (e) { showModalAlert('alertInfo', 'error', 'Lỗi kết nối: ' + e.message); }
+    finally { btn.disabled = false; if (ic) ic.className = oldIcon || 'fas fa-floppy-disk'; }
+}
+
+async function submitChangePassword() {
+    const btn = document.getElementById('btnSaveProfile');
+    clearAllFieldErrors();
+    const curPw = document.getElementById('inp_curPw').value;
+    const newPw = document.getElementById('inp_newPw').value;
+    const confirmPw = document.getElementById('inp_confirmPw').value;
+
+    let hasError = false, firstErrFieldId = null;
+    if (!curPw) { setFieldError('inp_curPw', 'err_curPw', 'Vui lòng nhập mật khẩu hiện tại.'); hasError = true; firstErrFieldId = firstErrFieldId || 'inp_curPw'; }
+    const pwErr = getPasswordError(newPw);
+    if (pwErr) { setFieldError('inp_newPw', 'err_newPw', pwErr); hasError = true; firstErrFieldId = firstErrFieldId || 'inp_newPw'; }
+    if (!confirmPw) { setFieldError('inp_confirmPw', 'err_confirmPw', 'Vui lòng nhập lại mật khẩu.'); hasError = true; firstErrFieldId = firstErrFieldId || 'inp_confirmPw'; }
+    else if (newPw !== confirmPw) { setFieldError('inp_confirmPw', 'err_confirmPw', 'Mật khẩu xác nhận không khớp!'); hasError = true; firstErrFieldId = firstErrFieldId || 'inp_confirmPw'; }
+    if (hasError) { document.getElementById(firstErrFieldId)?.focus(); showModalAlert('alertPassword', 'error', 'Vui lòng kiểm tra lại mật khẩu.'); return; }
+
+    btn.disabled = true;
+    const ic = btn.querySelector('i'); const oldIcon = ic ? ic.className : '';
+    if (ic) ic.className = 'fas fa-spinner fa-spin';
+
+    try {
+        const fd = new FormData(document.getElementById('formChangePassword'));
+        fd.set('csrf_token', STATE.csrfToken);
+        const res = await fetch(CONFIG.API_RESET_PW, { method: 'POST', body: fd, credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) throw new Error('Backend trả về dữ liệu không hợp lệ.');
+        const data = await res.json();
+        if (data.success) {
+            showModalAlert('alertPassword', 'success', data.message || 'Đổi mật khẩu thành công!');
+            document.getElementById('formChangePassword').reset();
+            updatePwRules('');
+        } else showModalAlert('alertPassword', 'error', data.message || 'Đổi mật khẩu thất bại!');
+    } catch (e) { showModalAlert('alertPassword', 'error', 'Lỗi kết nối: ' + e.message); }
+    finally { btn.disabled = false; if (ic) ic.className = oldIcon || 'fas fa-floppy-disk'; }
+}
+
+function initLogout() {
+    const btn = document.getElementById('btnConfirmLogout');
+    btn?.addEventListener('click', async () => {
+        btn.disabled = true;
+        try {
+            const res = await fetch(`${CONFIG.API_LOGIN}?action=logout`, { method: 'POST', credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const data = await res.json();
+            window.location.href = data.redirect_url || CONFIG.LOGIN_PAGE;
+        } catch (e) { window.location.href = CONFIG.LOGIN_PAGE; }
+    });
+}
+
+(async function init() {
+    const ok = await checkAuth();
+    if (!ok) return;
+    await loadCsrfToken();
+    renderSidebarMenu();
+    fillUserInfo();
+    initNotifActions();
+    initTabs();
+    initFilter();
+    initProfileModal();
+    initLogout();
+    document.getElementById('formReceive').addEventListener('submit', submitReceive);
+    
+    document.getElementById('btnBulkReceive')?.addEventListener('click', submitBulkReceive);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    STATE.tab = urlParams.get('tab') || 'pending';
+    if (!['pending', 'received'].includes(STATE.tab)) STATE.tab = 'pending';
+    STATE.filters.keyword = urlParams.get('keyword') || '';
+
+    document.getElementById('tabPending').classList.toggle('active', STATE.tab === 'pending');
+    document.getElementById('tabReceived').classList.toggle('active', STATE.tab === 'received');
+    document.getElementById('tableTitle').textContent = (STATE.tab === 'pending') ? 'Danh Sách Chờ Tiếp Nhận' : 'Danh Sách Đã Tiếp Nhận';
+    document.getElementById('filterKeyword').value = STATE.filters.keyword;
+
+    await loadList();
+    loadNotifications();
+})();
+</script>
+
+</body>
+</html>

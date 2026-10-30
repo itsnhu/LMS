@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập - Bệnh Viện Đa Khoa Tâm Trí Đồng Tháp</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --medical-primary-dark: #0369a1;
+            --medical-primary-mid: #0284c7;
+            --medical-btn: #0ea5e9;
+        }
+
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-contacts-auto-fill-button,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important; visibility: hidden !important;
+            pointer-events: none !important; position: absolute !important;
+            right: -9999px !important; opacity: 0 !important;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            width: 100% !important; height: 100% !important;
+            margin: 0 !important; padding: 0 !important;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; padding: 20px;
+            background-image: url('uploads/img/hinhnen.jpg');
+            background-size: cover; background-position: center center;
+            background-repeat: no-repeat; background-attachment: fixed;
+        }
+
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 0;
+        }
+
+        .page-wrapper {
+            width: 100%; max-width: 880px; min-height: 500px;
+            background: #ffffff; border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.2);
+            display: flex; position: relative; z-index: 1;
+            overflow: hidden; margin: auto;
+        }
+
+        .left-section {
+            flex: 1.2;
+            background-image: url('uploads/img/hinhnen.jpg');
+            background-size: cover; background-position: right center;
+            background-repeat: no-repeat; background-color: #0f172a;
+            position: relative; z-index: 1;
+        }
+
+        .left-section::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg,
+                rgba(3, 105, 161, 0.35) 0%,
+                rgba(14, 165, 233, 0.15) 50%,
+                rgba(15, 23, 42, 0.4) 100%);
+            z-index: 2;
+        }
+
+        .right-section {
+            flex: 1; background: var(--medical-primary-dark);
+            color: #ffffff; padding: 35px 40px;
+            display: flex; flex-direction: column; justify-content: center;
+            position: relative; z-index: 2;
+            box-shadow: -10px 0 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .wave-divider {
+            position: absolute; top: 0; left: -70px;
+            height: 100%; width: 75px; z-index: 3;
+            pointer-events: none;
+            filter: drop-shadow(-5px 0 6px rgba(0, 0, 0, 0.12));
+        }
+
+        .wave-divider svg { height: 100%; width: 100%; }
+
+        .login-title {
+            font-size: 1.6rem; font-weight: 800;
+            letter-spacing: 1.5px; margin-bottom: 20px;
+            color: #ffffff; text-transform: uppercase;
+        }
+
+        .form-group-custom { margin-bottom: 16px; }
+
+        .form-group-custom label {
+            display: block; font-size: 0.82rem; font-weight: 600;
+            color: rgba(255, 255, 255, 0.92); margin-bottom: 6px;
+        }
+
+        .input-box-custom {
+            position: relative; display: flex; align-items: center;
+            background: var(--medical-primary-mid);
+            border-radius: 25px; padding: 2px 16px;
+            border: 1.5px solid transparent;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-box-custom:focus-within {
+            border-color: #38bdf8; background: #075985;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-box-custom .input-icon {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem; margin-right: 10px;
+        }
+
+        .input-box-custom input {
+            background: transparent; border: none; color: #ffffff;
+            font-size: 0.88rem; width: 100%; padding: 9px 0; outline: none;
+            -webkit-box-shadow: 0 0 0 30px var(--medical-primary-mid) inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            caret-color: #ffffff;
+        }
+
+        .input-box-custom input::placeholder { color: rgba(255, 255, 255, 0.55); }
+
+        .input-box-custom input:-webkit-autofill,
+        .input-box-custom input:-webkit-autofill:hover,
+        .input-box-custom input:-webkit-autofill:focus,
+        .input-box-custom input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--medical-primary-mid) inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .btn-toggle-pw {
+            background: transparent; border: none;
+            color: rgba(255, 255, 255, 0.75); cursor: pointer;
+            padding: 0 4px; font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .btn-toggle-pw:hover { color: #ffffff; }
+
+        .btn-submit-custom {
+            background: var(--medical-btn); color: #ffffff;
+            font-weight: 700; font-size: 0.9rem; letter-spacing: 1px;
+            border-radius: 25px; padding: 10px 20px; border: none;
+            width: 100%; margin-top: 8px; cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.35);
+            text-transform: uppercase;
+        }
+
+        .btn-submit-custom:hover {
+            background: #38bdf8; transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.45);
+            color: #ffffff;
+        }
+
+        .btn-submit-custom:disabled {
+            opacity: 0.75; cursor: not-allowed; transform: none;
+        }
+
+        .bottom-links {
+            margin-top: 18px; font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .bottom-links a {
+            color: #7dd3fc; font-weight: 700; text-decoration: none;
+        }
+
+        .bottom-links a:hover { text-decoration: underline; }
+
+        .alert-custom {
+            border-radius: 12px; padding: 8px 12px;
+            font-size: 0.82rem; margin-bottom: 15px;
+        }
+
+        @media (max-width: 850px) {
+            .page-wrapper {
+                flex-direction: column; max-width: 420px; min-height: auto;
+            }
+            .left-section { min-height: 140px; }
+            .right-section { padding: 25px 20px; }
+            .wave-divider { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <div class="left-section"></div>
+
+    <div class="right-section">
+        <div class="wave-divider">
+            <svg viewBox="0 0 100 500" preserveAspectRatio="none">
+                <path d="M100,0 C25,150 100,300 0,500 L100,500 Z" fill="#0369a1"></path>
+            </svg>
+        </div>
+
+        <div style="max-width: 340px; width: 100%; margin: 0 auto;">
+            <h2 class="login-title text-center">ĐĂNG NHẬP</h2>
+
+            <div id="alertBox" class="alert alert-danger alert-custom d-none align-items-center gap-2" role="alert">
+                <i class="fas fa-exclamation-circle fs-6"></i>
+                <div id="alertMessage"></div>
+            </div>
+
+            <form id="loginForm" novalidate autocomplete="off">
+                <input type="text" name="fake_username" id="fake_username" style="display: none;" tabindex="-1" autocomplete="off">
+                <input type="password" name="fake_password" id="fake_password" style="display: none;" tabindex="-1" autocomplete="off">
+                <input type="hidden" name="csrf_token" id="csrfToken" value="">
+
+                <div class="form-group-custom">
+                    <label for="username">Tên đăng nhập</label>
+                    <div class="input-box-custom">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" name="username" id="username"
+                               placeholder="Tên đăng nhập hoặc mã nhân viên"
+                               required autofocus autocomplete="off"
+                               autocorrect="off" autocapitalize="off" spellcheck="false"
+                               readonly onfocus="this.removeAttribute('readonly')">
+                    </div>
+                </div>
+
+                <div class="form-group-custom">
+                    <label for="password">Mật khẩu</label>
+                    <div class="input-box-custom">
+                        <i class="fas fa-key input-icon"></i>
+                        <input type="password" name="password" id="password"
+                               placeholder="Nhập mật khẩu"
+                               required autocomplete="new-password"
+                               readonly onfocus="this.removeAttribute('readonly')">
+                        <button type="button" class="btn-toggle-pw" id="btnTogglePassword" title="Hiện/Ẩn mật khẩu">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-custom" id="btnSubmit">
+                    ĐĂNG NHẬP <i class="fas fa-arrow-right ms-1" style="font-size: 0.85rem;"></i>
+                </button>
+            </form>
+
+            <div class="bottom-links text-center">
+                <span>Bạn quên mật khẩu?</span>
+                <a href="laylaimatkhau.html" class="ms-1">Đặt lại mật khẩu</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+   CẤU HÌNH
+   ============================================================ */
+const CONFIG = {
+    API_LOGIN_URL: '../backend/api/dangnhap.php',
+    API_CSRF_URL:  '../backend/api/csrf.php',
+    HOME_PAGE:     'trangchu.html'
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function b64EncodeUnicode(str) {
+    const bytes = new TextEncoder().encode(str);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}
+
+function showAlert(message) {
+    document.getElementById('alertMessage').innerText = message;
+    document.getElementById('alertBox').classList.remove('d-none');
+}
+
+function hideAlert() {
+    document.getElementById('alertBox').classList.add('d-none');
+}
+
+/* ============================================================
+   XÓA AUTOFILL KHI LOAD TRANG
+   ============================================================ */
+window.addEventListener('load', function () {
+    setTimeout(function () {
+        const u = document.getElementById('username');
+        const p = document.getElementById('password');
+        if (u) u.value = '';
+        if (p) p.value = '';
+    }, 100);
+});
+
+/* ============================================================
+   CSRF
+   ============================================================ */
+async function fetchCsrfToken(retries = 2) {
+    for (let i = 0; i <= retries; i++) {
+        try {
+            const res = await fetch(CONFIG.API_CSRF_URL + '?t=' + Date.now(), {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const text = await res.text();
+            if (res.ok) {
+                try {
+                    const data = JSON.parse(text);
+                    if (data && data.csrf_token) return data.csrf_token;
+                } catch (e) {}
+            }
+        } catch (e) {}
+        if (i < retries) await new Promise(r => setTimeout(r, 800));
+    }
+    return null;
+}
+
+(async function initCsrf() {
+    const token = await fetchCsrfToken();
+    if (token) {
+        document.getElementById('csrfToken').value = token;
+        console.log('[Login] ✅ CSRF token ready');
+    } else {
+        showAlert('Không thể khởi tạo phiên. Vui lòng tải lại trang (F5).');
+    }
+})();
+
+/* ============================================================
+   TOGGLE PASSWORD
+   ============================================================ */
+document.getElementById('btnTogglePassword').addEventListener('click', function () {
+    const pwInput = document.getElementById('password');
+    const icon = document.getElementById('toggleIcon');
+    if (pwInput.type === 'password') {
+        pwInput.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        pwInput.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+});
+
+/* ============================================================
+   WAF WORKAROUND — Submit qua Form + Iframe ẩn
+   Trình duyệt sẽ tự động giải aes.js nếu WAF yêu cầu
+   ============================================================ */
+function doLoginRequestIframe(username, password, csrfToken) {
+    return new Promise((resolve, reject) => {
+        const frameName = 'login_frame_' + Date.now();
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.name = frameName;
+        document.body.appendChild(iframe);
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = CONFIG.API_LOGIN_URL;
+        form.target = frameName;
+        form.style.display = 'none';
+
+        const payload = { username, password, csrf_token: csrfToken };
+        const encoded = b64EncodeUnicode(JSON.stringify(payload));
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'data';
+        input.value = encoded;
+        form.appendChild(input);
+
+        document.body.appendChild(form);
+
+        let attempts = 0;
+
+        iframe.onload = () => {
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                const text = doc.body.innerText || doc.body.textContent || '';
+                
+                // Nếu dính thử thách aes.js -> Đợi trình duyệt tự giải và reload
+                if (text.includes('aes.js')) {
+                    attempts++;
+                    console.log('[Login] Đang giải WAF Challenge (lần ' + attempts + ')...');
+                    if (attempts > 3) {
+                        reject(new Error('WAF Challenge timeout'));
+                        iframe.remove();
+                        form.remove();
+                    }
+                    return;
+                }
+
+                // Nếu bị block cứng
+                if (text.includes('openresty') || text.includes('403 Forbidden')) {
+                    resolve({ status: 403, text: text });
+                    iframe.remove();
+                    form.remove();
+                    return;
+                }
+
+                // Nếu thành công trả về JSON
+                resolve({ status: 200, text: text.trim() });
+                iframe.remove();
+                form.remove();
+
+            } catch (e) {
+                reject(e);
+                iframe.remove();
+                form.remove();
+            }
+        };
+
+        form.submit();
+
+        // Timeout an toàn sau 10s
+        setTimeout(() => {
+            if (document.body.contains(iframe)) {
+                reject(new Error('Timeout'));
+                iframe.remove();
+                form.remove();
+            }
+        }, 10000);
+    });
+}
+
+/* ============================================================
+   SUBMIT FORM
+   ============================================================ */
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const btnSubmit = document.getElementById('btnSubmit');
+    const username  = document.getElementById('username').value.trim();
+    const password  = document.getElementById('password').value;
+    let   csrfToken = document.getElementById('csrfToken').value;
+
+    if (!username || !password) {
+        showAlert('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!');
+        return;
+    }
+
+    hideAlert();
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang xử lý...';
+
+    try {
+        if (!csrfToken) {
+            csrfToken = await fetchCsrfToken();
+            if (!csrfToken) {
+                showAlert('Không thể khởi tạo phiên làm việc. Vui lòng tải lại trang (F5).');
+                return;
+            }
+            document.getElementById('csrfToken').value = csrfToken;
+        }
+
+        // Gửi request qua Iframe
+        const response = await doLoginRequestIframe(username, password, csrfToken);
+        console.log('[Login] HTTP ' + response.status + ' | body:', response.text.substring(0, 300));
+
+        let result = null;
+        try {
+            result = JSON.parse(response.text);
+        } catch (parseErr) {
+            if (response.status === 403) {
+                showAlert('⛔ IP của bạn đang bị InfinityFree tạm khóa do thử quá nhiều lần. Vui lòng đổi mạng (4G) hoặc đợi 30 phút rồi thử lại.');
+            } else {
+                showAlert('⚠️ Phản hồi không hợp lệ từ server.');
+            }
+            return;
+        }
+
+        if (result && result.success) {
+            console.log('[Login] ✅ Thành công!');
+            window.location.href = CONFIG.HOME_PAGE;
+            return;
+        }
+
+        showAlert(result.message || 'Tài khoản hoặc mật khẩu không chính xác!');
+
+    } catch (error) {
+        console.error('[Login] ❌ Lỗi:', error);
+        showAlert('Lỗi kết nối hệ thống! Vui lòng thử lại sau.');
+
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = 'ĐĂNG NHẬP <i class="fas fa-arrow-right ms-1" style="font-size: 0.85rem;"></i>';
+    }
+});
+
+/* ============================================================
+   ENTER để submit
+   ============================================================ */
+document.getElementById('username').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('password').focus();
+    }
+});
+
+document.getElementById('password').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('loginForm').requestSubmit();
+    }
+});
+</script>
+
+</body>
+</html>
