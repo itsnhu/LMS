@@ -28,4 +28,4 @@ Hệ thống được thiết kế với 4 vai trò (Actors) chính tương ứn
 ## 🚀 Trải nghiệm
 
 👉 **[BẤM VÀO ĐÂY ĐỂ TRẢI NGHIỆM HỆ THỐNG][https://giaynghiphepbienvien.infinityfreeapp.com](https://giaynghiphepbienvien.infinityfreeapp.com)** 
-giaynghiphepbenhvien.infinityfreeapp.com
+https://giaynghiphepbenhvien.infinityfreeapp.com/frontend/dangnhap.html
